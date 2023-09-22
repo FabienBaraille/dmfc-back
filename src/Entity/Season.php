@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SeasonRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,6 +33,16 @@ class Season
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Leaderboard::class, mappedBy="Season", orphanRemoval=true)
+     */
+    private $leaderboards;
+
+    public function __construct()
+    {
+        $this->leaderboards = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -69,6 +81,36 @@ class Season
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Leaderboard>
+     */
+    public function getLeaderboards(): Collection
+    {
+        return $this->leaderboards;
+    }
+
+    public function addLeaderboard(Leaderboard $leaderboard): self
+    {
+        if (!$this->leaderboards->contains($leaderboard)) {
+            $this->leaderboards[] = $leaderboard;
+            $leaderboard->setSeason($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLeaderboard(Leaderboard $leaderboard): self
+    {
+        if ($this->leaderboards->removeElement($leaderboard)) {
+            // set the owning side to null (unless already changed)
+            if ($leaderboard->getSeason() === $this) {
+                $leaderboard->setSeason(null);
+            }
+        }
 
         return $this;
     }

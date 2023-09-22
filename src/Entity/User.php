@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -71,6 +73,23 @@ class User
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Leaderboard::class, mappedBy="User", orphanRemoval=true)
+     */
+    private $leaderboards;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Srprediction::class, mappedBy="User", orphanRemoval=true)
+     */
+    private $srpredictions;
+
+    public function __construct()
+    {
+        $this->leaderboards = new ArrayCollection();
+        $this->srpredictions = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -208,4 +227,66 @@ class User
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Leaderboard>
+     */
+    public function getLeaderboards(): Collection
+    {
+        return $this->leaderboards;
+    }
+
+    public function addLeaderboard(Leaderboard $leaderboard): self
+    {
+        if (!$this->leaderboards->contains($leaderboard)) {
+            $this->leaderboards[] = $leaderboard;
+            $leaderboard->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLeaderboard(Leaderboard $leaderboard): self
+    {
+        if ($this->leaderboards->removeElement($leaderboard)) {
+            // set the owning side to null (unless already changed)
+            if ($leaderboard->getUser() === $this) {
+                $leaderboard->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Srprediction>
+     */
+    public function getSrpredictions(): Collection
+    {
+        return $this->srpredictions;
+    }
+
+    public function addSrprediction(Srprediction $srprediction): self
+    {
+        if (!$this->srpredictions->contains($srprediction)) {
+            $this->srpredictions[] = $srprediction;
+            $srprediction->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSrprediction(Srprediction $srprediction): self
+    {
+        if ($this->srpredictions->removeElement($srprediction)) {
+            // set the owning side to null (unless already changed)
+            if ($srprediction->getUser() === $this) {
+                $srprediction->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    
 }

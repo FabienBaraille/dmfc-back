@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\GameRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -56,6 +58,16 @@ class Game
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Srprediction::class, mappedBy="Game", orphanRemoval=true)
+     */
+    private $srpredictions;
+
+    public function __construct()
+    {
+        $this->srpredictions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -154,6 +166,36 @@ class Game
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Srprediction>
+     */
+    public function getSrpredictions(): Collection
+    {
+        return $this->srpredictions;
+    }
+
+    public function addSrprediction(Srprediction $srprediction): self
+    {
+        if (!$this->srpredictions->contains($srprediction)) {
+            $this->srpredictions[] = $srprediction;
+            $srprediction->setGame($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSrprediction(Srprediction $srprediction): self
+    {
+        if ($this->srpredictions->removeElement($srprediction)) {
+            // set the owning side to null (unless already changed)
+            if ($srprediction->getGame() === $this) {
+                $srprediction->setGame(null);
+            }
+        }
 
         return $this;
     }
