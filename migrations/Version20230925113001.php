@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230925092151 extends AbstractMigration
+final class Version20230925113001 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,16 @@ final class Version20230925092151 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE news (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(50) NOT NULL, description LONGTEXT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE news ADD league_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE news ADD CONSTRAINT FK_1DD3995058AFC4DE FOREIGN KEY (league_id) REFERENCES league (id)');
+        $this->addSql('CREATE INDEX IDX_1DD3995058AFC4DE ON news (league_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP TABLE news');
+        $this->addSql('ALTER TABLE news DROP FOREIGN KEY FK_1DD3995058AFC4DE');
+        $this->addSql('DROP INDEX IDX_1DD3995058AFC4DE ON news');
+        $this->addSql('ALTER TABLE news DROP league_id');
     }
 }

@@ -39,9 +39,15 @@ class Season
      */
     private $leaderboards;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Round::class, mappedBy="season", orphanRemoval=true)
+     */
+    private $rounds;
+
     public function __construct()
     {
         $this->leaderboards = new ArrayCollection();
+        $this->rounds = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -109,6 +115,36 @@ class Season
             // set the owning side to null (unless already changed)
             if ($leaderboard->getSeason() === $this) {
                 $leaderboard->setSeason(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Round>
+     */
+    public function getRounds(): Collection
+    {
+        return $this->rounds;
+    }
+
+    public function addRound(Round $round): self
+    {
+        if (!$this->rounds->contains($round)) {
+            $this->rounds[] = $round;
+            $round->setSeason($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRound(Round $round): self
+    {
+        if ($this->rounds->removeElement($round)) {
+            // set the owning side to null (unless already changed)
+            if ($round->getSeason() === $this) {
+                $round->setSeason(null);
             }
         }
 
