@@ -84,10 +84,27 @@ class User
      */
     private $srpredictions;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
+     */
+    private $team;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=League::class, inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $league;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Round::class, mappedBy="user")
+     */
+    private $rounds;
+
     public function __construct()
     {
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
+        $this->rounds = new ArrayCollection();
     }
 
 
@@ -282,6 +299,60 @@ class User
             // set the owning side to null (unless already changed)
             if ($srprediction->getUser() === $this) {
                 $srprediction->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTeam(): ?Team
+    {
+        return $this->team;
+    }
+
+    public function setTeam(?Team $team): self
+    {
+        $this->team = $team;
+
+        return $this;
+    }
+
+    public function getLeague(): ?League
+    {
+        return $this->league;
+    }
+
+    public function setLeague(?League $league): self
+    {
+        $this->league = $league;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Round>
+     */
+    public function getRounds(): Collection
+    {
+        return $this->rounds;
+    }
+
+    public function addRound(Round $round): self
+    {
+        if (!$this->rounds->contains($round)) {
+            $this->rounds[] = $round;
+            $round->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRound(Round $round): self
+    {
+        if ($this->rounds->removeElement($round)) {
+            // set the owning side to null (unless already changed)
+            if ($round->getUser() === $this) {
+                $round->setUser(null);
             }
         }
 
