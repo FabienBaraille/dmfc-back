@@ -28,7 +28,7 @@ class Srprediction
     private $predictedPointDifference;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="string", length=20)
      */
     private $validationStatus;
 
@@ -98,12 +98,12 @@ class Srprediction
         return $this;
     }
 
-    public function getValidationStatus(): ?int
+    public function getValidationStatus(): ?string
     {
         return $this->validationStatus;
     }
 
-    public function setValidationStatus(int $validationStatus): self
+    public function setValidationStatus(string $validationStatus): self
     {
         $this->validationStatus = $validationStatus;
 

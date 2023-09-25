@@ -39,11 +39,7 @@ class Leaderboard
      */
     private $updatedAt;
 
-    /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="Leaderboard", orphanRemoval=true)
-     */
-    private $users;
-
+    
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="leaderboards")
      * @ORM\JoinColumn(nullable=false)
@@ -56,10 +52,6 @@ class Leaderboard
      */
     private $Season;
 
-    public function __construct()
-    {
-        $this->users = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
