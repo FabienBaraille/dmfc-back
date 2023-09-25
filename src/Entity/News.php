@@ -27,6 +27,11 @@ class News
      */
     private $description;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=League::class, inversedBy="news")
+     */
+    private $league;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -52,6 +57,18 @@ class News
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getLeague(): ?League
+    {
+        return $this->league;
+    }
+
+    public function setLeague(?League $league): self
+    {
+        $this->league = $league;
 
         return $this;
     }

@@ -49,10 +49,16 @@ class League
      */
     private $rounds;
 
+    /**
+     * @ORM\OneToMany(targetEntity=News::class, mappedBy="league")
+     */
+    private $news;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->rounds = new ArrayCollection();
+        $this->news = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -162,6 +168,36 @@ class League
             // set the owning side to null (unless already changed)
             if ($round->getLeague() === $this) {
                 $round->setLeague(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, News>
+     */
+    public function getNews(): Collection
+    {
+        return $this->news;
+    }
+
+    public function addNews(News $news): self
+    {
+        if (!$this->news->contains($news)) {
+            $this->news[] = $news;
+            $news->setLeague($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNews(News $news): self
+    {
+        if ($this->news->removeElement($news)) {
+            // set the owning side to null (unless already changed)
+            if ($news->getLeague() === $this) {
+                $news->setLeague(null);
             }
         }
 
