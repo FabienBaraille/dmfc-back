@@ -70,13 +70,16 @@ class Team
     private $users;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Game::class, inversedBy="teams")
+     * @ORM\ManyToMany(targetEntity=Game::class, mappedBy="team")
      */
-    private $game;
+    private $games;
+
+    
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->games = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -222,15 +225,32 @@ class Team
         return $this;
     }
 
-    public function getGame(): ?Game
+    /**
+     * @return Collection<int, Game>
+     */
+    public function getGames(): Collection
     {
-        return $this->game;
+        return $this->games;
     }
 
-    public function setGame(?Game $game): self
+    public function addGame(Game $game): self
     {
-        $this->game = $game;
+        if (!$this->games->contains($game)) {
+            $this->games[] = $game;
+            $game->addTeam($this);
+        }
 
         return $this;
     }
+
+    public function removeGame(Game $game): self
+    {
+        if ($this->games->removeElement($game)) {
+            $game->removeTeam($this);
+        }
+
+        return $this;
+    }
+
+
 }
