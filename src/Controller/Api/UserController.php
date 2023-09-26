@@ -18,35 +18,40 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserController extends AbstractController
 {
     /**
-     * @Route("/api/user/league", name="app_api_league_get_user_by_league", methods={"GET"})
-     */
-    public function getUsersByLeague(League $league = null,UserRepository $userRepository): JsonResponse
-    {
-    
-        if ($league === null) {
-            throw $this->createNotFoundException('Ressource non trouvée.');
-        }
-        return $this->json($userRepository->findByLeague($league), 200, [], ['groups' => 'get_login_league' ]);
-    }
-
-    /**
      * GET users collection
      * 
      * @Route("/api/user", name="app_api_user", methods={"GET"})
      */
     public function getUserAll(UserRepository $userRepository): JsonResponse
     {
-        // données à retourner
-        ;
-
+        $users = $userRepository->findAll();
+        
         return $this->json(
-            $user = $userRepository->findAll(),
-            
+            $users,
             200,
-
             [],
-            
             ['groups' => 'get_login']
         );
+    } 
+
+    /**
+     * GET users collection
+     *
+     * @Route("/api/user/{id}", name="app_api_user_by_id", methods={"GET"})
+     */
+    public function getUserById(UserRepository $userRepository, $userId): JsonResponse
+    {
+        $user = $userRepository->findBy(['id' => $userId]);
+
+    
+        return $this->json(
+        
+            $user,
+            200,
+            [],
+            ['groups' => 'get_id']
+    
+        );
     }
+
 }
