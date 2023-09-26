@@ -64,7 +64,15 @@ class AppFixtures extends Fixture
 
             $league->setCreatedAt($createdAt);
             $manager->persist($league);
-            
+
+        // League
+            $league2 = new League;
+            $league2->setLeagueName("Ligue des Pompons");
+            $league2->setLeagueDescription("Bienvenue dans la ligue des pompons !");
+
+            $league2->setCreatedAt($createdAt);
+            $manager->persist($league2);
+        
 
         // User
             // Admin
@@ -92,35 +100,74 @@ class AppFixtures extends Fixture
 
             $manager->persist($userDMFC);
 
-        // Joueurs
-        $users = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $user = new User();
-            $user->setUsername("joueur$i");
-            $user->setEmail("joueur$i@example.com");
-            $user->setRole(['ROLE_JOUEUR']);
-            $user->setPassword('joueur$i');
-            $user->setTitle("C'est moi, le joueur $i");
-            $user->setScore($faker->numberBetween(10, 50));
-            $user->setOldPosition($faker->numberBetween(1, 5));
-            $user->setPosition($faker->numberBetween(1, 5));
-            $user->setSeasonPlayed(3);
-            $user->setLeague($league);
-            $user->setCreatedAt($createdAt);
+            // Maître du jeu
+            $userDMFC2 = new User;
+            $userDMFC2->setUsername('DMFC2');
+            $userDMFC2->setEmail('dmfc2@dmfc2.com');
+            $userDMFC2->setRole(['ROLE_DMFC']);
+            $userDMFC2->setPassword('dmfc2');
+            $userDMFC2->setTitle("C'est moi, le maître du jeu N°2");
+            $userDMFC2->setSeasonPlayed("3");
+            $userDMFC2->setLeague($league2);
+            $userDMFC2->setCreatedAt($createdAt);
 
-            $users[] = $user;
-            $manager->persist($user);
-        }
+            $manager->persist($userDMFC2);
+
+            // Joueurs
+            $users = [];
+            for ($i = 1; $i <= 5; $i++) {
+                $user = new User();
+                $user->setUsername("joueur$i");
+                $user->setEmail("joueur$i@example.com");
+                $user->setRole(['ROLE_JOUEUR']);
+                $user->setPassword("joueur$i");
+                $user->setTitle("C'est moi, le joueur $i");
+                $user->setScore($faker->numberBetween(10, 50));
+                $user->setOldPosition($faker->numberBetween(1, 5));
+                $user->setPosition($faker->numberBetween(1, 5));
+                $user->setSeasonPlayed(3);
+                $user->setLeague($league);
+                $user->setCreatedAt($createdAt);
+
+                $users[] = $user;
+                $manager->persist($user);
+            }
+
+            for ($i = 6; $i <= 10; $i++) {
+                $user2 = new User();
+                $user2->setUsername("joueur$i");
+                $user2->setEmail("joueur$i@example.com");
+                $user2->setRole(['ROLE_JOUEUR']);
+                $user2->setPassword("joueur$i");
+                $user2->setTitle("C'est moi, le joueur $i");
+                $user2->setScore($faker->numberBetween(10, 50));
+                $user2->setOldPosition($faker->numberBetween(1, 5));
+                $user2->setPosition($faker->numberBetween(1, 5));
+                $user2->setSeasonPlayed(3);
+                $user2->setLeague($league2);
+                $user2->setCreatedAt($createdAt);
+
+                $users[] = $user2;
+                $manager->persist($user2);
+            }
 
         // News
             $news = new News;
             $news->setLeague($league);
-            $news->setTitle("Début de saison");
+            $news->setTitle("Début de saison pour les jusiciers");
             $news->setDescription("C'est un nouveau jour pour nous !");
             $news->setCreatedAt($createdAt);
                 
             $manager->persist($news);
 
+            $news2 = new News;
+            $news2->setLeague($league2);
+            $news2->setTitle("Début de saison pour les Pompons");
+            $news2->setDescription("C'est un nouveau jour pour nous !");
+            $news2->setCreatedAt($createdAt);
+                
+            $manager->persist($news2);
+        
 
         // Season
             $season = new Season;
@@ -130,121 +177,146 @@ class AppFixtures extends Fixture
             $manager->persist($season);
 
         // Leaderboard
-        foreach ($users as $user) {
-            $leaderboard = new Leaderboard();
-            $leaderboard->setFinalScore($user->getScore());
-            $leaderboard->setFinalRank($user->getPosition());
-            $leaderboard->setCreatedAt(new DateTime());
-            $leaderboard->setSeason($season);
-            $leaderboard->setUser($user);
+            foreach ($users as $user) {
+                $leaderboard = new Leaderboard();
+                $leaderboard->setFinalScore($user->getScore());
+                $leaderboard->setFinalRank($user->getPosition());
+                $leaderboard->setCreatedAt(new DateTime());
+                $leaderboard->setSeason($season);
+                $leaderboard->setUser($user);
 
-            $leaderboards[] = $leaderboard;
+                $leaderboards[] = $leaderboard;
 
-            // Triez les classements par score final
-            usort($leaderboards, function ($a, $b) {
-                return $b->getFinalScore() - $a->getFinalScore();
-            });
+                // Triez les classements par score final
+                usort($leaderboards, function ($a, $b) {
+                    return $b->getFinalScore() - $a->getFinalScore();
+                });
 
-            // Affectez le classement final en fonction de l'ordre trié
-            $rank = 1;
-            foreach ($leaderboards as $leaderboard) {
-                $leaderboard->setFinalRank($rank);
-                $manager->persist($leaderboard);
-                $rank++;
-            }
-        }                    
+                // Affectez le classement final en fonction de l'ordre trié
+                $rank = 1;
+                foreach ($leaderboards as $leaderboard) {
+                    $leaderboard->setFinalRank($rank);
+                    $manager->persist($leaderboard);
+                    $rank++;
+                }
+            }                    
+
+
+
         // Round
-            $round = new Round;
-            $round->setName("On se chauffe");
-            $round->setCategory("Saison Régulière");
-            $round->setCreatedAt($createdAt);
-            $round->setLeague($league);
-            $round->setUser($userDMFC);
-            $round->setSeason($season);
+            $rounds = [];
+            for ($i = 1; $i <= 5; $i++) {
+                $round = new Round();
+                $round->setName("round$i");
+                $round->setCategory("Saison Régulière");
+                $round->setCreatedAt($createdAt);
+                $round->setLeague($league);
+                $round->setUser($userDMFC);
+                $round->setSeason($season);
 
-            $manager->persist($round);
+                $rounds[] = $round;
+                $manager->persist($round);
+            }  
+        
+            $rounds2 = [];
+            for ($i = 1; $i <= 5; $i++) {
+                $round2 = new Round();
+                $round2->setName("round$i");
+                $round2->setCategory("Saison Régulière");
+                $round2->setCreatedAt($createdAt);
+                $round2->setLeague($league2);
+                $round2->setUser($userDMFC2);
+                $round2->setSeason($season);
+
+                $rounds2[] = $round2;
+                $manager->persist($round2);
+            }     
+
         // Game
-        $game = new Game;
-        $game->setDateAndTimeOfMatch(new DateTime('2023-10-17 23:00:00'));
-        $game->setRound($round);
-        $game->setCreatedAt($createdAt);
+            $games = [];
+            for ($i = 1; $i <= 60; $i++) {
+                $game = new Game();
+                $game->setDateAndTimeOfMatch($faker->dateTimeBetween('now', '+1 years'));
 
-        $manager->persist($game);
+                // Choisissez un tour aléatoire parmi les tours créés
+                $randomRoundIndex = array_rand($rounds);
+                $randomRound = $rounds[$randomRoundIndex];
 
+                $game->setRound($randomRound); 
+                $game->setCreatedAt($createdAt);
+
+                $games[] = $game;
+                $manager->persist($game);
+            }
+            
         // Team
-        $teamsData = [
-            ['name' => 'Atlanta Hawks', 'conference' => 'Eastern', 'trigram' => 'ATL'],
-            ['name' => 'Boston Celtics', 'conference' => 'Eastern', 'trigram' => 'BOS'],
-            ['name' => 'Brooklyn Nets', 'conference' => 'Eastern', 'trigram' => 'BKN'],
-            ['name' => 'Charlotte Hornets', 'conference' => 'Eastern', 'trigram' => 'CHA'],
-            ['name' => 'Chicago Bulls', 'conference' => 'Eastern', 'trigram' => 'CHI'],
-            ['name' => 'Cleveland Cavaliers', 'conference' => 'Eastern', 'trigram' => 'CLE'],
-            ['name' => 'Dallas Mavericks', 'conference' => 'Western', 'trigram' => 'DAL'],
-            ['name' => 'Denver Nuggets', 'conference' => 'Western', 'trigram' => 'DEN'],
-            ['name' => 'Detroit Pistons', 'conference' => 'Eastern', 'trigram' => 'DET'],
-            ['name' => 'Golden State Warriors', 'conference' => 'Western', 'trigram' => 'GSW'],
-            ['name' => 'Houston Rockets', 'conference' => 'Western', 'trigram' => 'HOU'],
-            ['name' => 'Indiana Pacers', 'conference' => 'Eastern', 'trigram' => 'IND'],
-            ['name' => 'LA Clippers', 'conference' => 'Western', 'trigram' => 'LAC'],
-            ['name' => 'Los Angeles Lakers', 'conference' => 'Western', 'trigram' => 'LAL'],
-            ['name' => 'Memphis Grizzlies', 'conference' => 'Western', 'trigram' => 'MEM'],
-            ['name' => 'Miami Heat', 'conference' => 'Eastern', 'trigram' => 'MIA'],
-            ['name' => 'Milwaukee Bucks', 'conference' => 'Eastern', 'trigram' => 'MIL'],
-            ['name' => 'Minnesota Timberwolves', 'conference' => 'Western', 'trigram' => 'MIN'],
-            ['name' => 'New Orleans Pelicans', 'conference' => 'Western', 'trigram' => 'NOP'],
-            ['name' => 'New York Knicks', 'conference' => 'Eastern', 'trigram' => 'NYK'],
-            ['name' => 'Oklahoma City Thunder', 'conference' => 'Western', 'trigram' => 'OKC'],
-            ['name' => 'Orlando Magic', 'conference' => 'Eastern', 'trigram' => 'ORL'],
-            ['name' => 'Philadelphia 76ers', 'conference' => 'Eastern', 'trigram' => 'PHI'],
-            ['name' => 'Phoenix Suns', 'conference' => 'Western', 'trigram' => 'PHX'],
-            ['name' => 'Portland Trail Blazers', 'conference' => 'Western', 'trigram' => 'POR'],
-            ['name' => 'Sacramento Kings', 'conference' => 'Western', 'trigram' => 'SAC'],
-            ['name' => 'San Antonio Spurs', 'conference' => 'Western', 'trigram' => 'SAS'],
-            ['name' => 'Toronto Raptors', 'conference' => 'Eastern', 'trigram' => 'TOR'],
-            ['name' => 'Utah Jazz', 'conference' => 'Western', 'trigram' => 'UTA'],
-            ['name' => 'Washington Wizards', 'conference' => 'Eastern', 'trigram' => 'WAS'],
-        ];
+            $teamsData = [
+                ['name' => 'Atlanta Hawks', 'conference' => 'Eastern', 'trigram' => 'ATL'],
+                ['name' => 'Boston Celtics', 'conference' => 'Eastern', 'trigram' => 'BOS'],
+                ['name' => 'Brooklyn Nets', 'conference' => 'Eastern', 'trigram' => 'BKN'],
+                ['name' => 'Charlotte Hornets', 'conference' => 'Eastern', 'trigram' => 'CHA'],
+                ['name' => 'Chicago Bulls', 'conference' => 'Eastern', 'trigram' => 'CHI'],
+                ['name' => 'Cleveland Cavaliers', 'conference' => 'Eastern', 'trigram' => 'CLE'],
+                ['name' => 'Dallas Mavericks', 'conference' => 'Western', 'trigram' => 'DAL'],
+                ['name' => 'Denver Nuggets', 'conference' => 'Western', 'trigram' => 'DEN'],
+                ['name' => 'Detroit Pistons', 'conference' => 'Eastern', 'trigram' => 'DET'],
+                ['name' => 'Golden State Warriors', 'conference' => 'Western', 'trigram' => 'GSW'],
+                ['name' => 'Houston Rockets', 'conference' => 'Western', 'trigram' => 'HOU'],
+                ['name' => 'Indiana Pacers', 'conference' => 'Eastern', 'trigram' => 'IND'],
+                ['name' => 'LA Clippers', 'conference' => 'Western', 'trigram' => 'LAC'],
+                ['name' => 'Los Angeles Lakers', 'conference' => 'Western', 'trigram' => 'LAL'],
+                ['name' => 'Memphis Grizzlies', 'conference' => 'Western', 'trigram' => 'MEM'],
+                ['name' => 'Miami Heat', 'conference' => 'Eastern', 'trigram' => 'MIA'],
+                ['name' => 'Milwaukee Bucks', 'conference' => 'Eastern', 'trigram' => 'MIL'],
+                ['name' => 'Minnesota Timberwolves', 'conference' => 'Western', 'trigram' => 'MIN'],
+                ['name' => 'New Orleans Pelicans', 'conference' => 'Western', 'trigram' => 'NOP'],
+                ['name' => 'New York Knicks', 'conference' => 'Eastern', 'trigram' => 'NYK'],
+                ['name' => 'Oklahoma City Thunder', 'conference' => 'Western', 'trigram' => 'OKC'],
+                ['name' => 'Orlando Magic', 'conference' => 'Eastern', 'trigram' => 'ORL'],
+                ['name' => 'Philadelphia 76ers', 'conference' => 'Eastern', 'trigram' => 'PHI'],
+                ['name' => 'Phoenix Suns', 'conference' => 'Western', 'trigram' => 'PHX'],
+                ['name' => 'Portland Trail Blazers', 'conference' => 'Western', 'trigram' => 'POR'],
+                ['name' => 'Sacramento Kings', 'conference' => 'Western', 'trigram' => 'SAC'],
+                ['name' => 'San Antonio Spurs', 'conference' => 'Western', 'trigram' => 'SAS'],
+                ['name' => 'Toronto Raptors', 'conference' => 'Eastern', 'trigram' => 'TOR'],
+                ['name' => 'Utah Jazz', 'conference' => 'Western', 'trigram' => 'UTA'],
+                ['name' => 'Washington Wizards', 'conference' => 'Eastern', 'trigram' => 'WAS'],
+            ];
 
-        foreach ($teamsData as $teamData) {
-            $team = new Team();
-            $team->setName($teamData['name']);
-            $team->setConference($teamData['conference']);
-            $team->setTrigram($teamData['trigram']);
-            $team->setCreatedAt($createdAt);
-            $team->setNbSelectedAway($faker->numberBetween(0, 6));
-            $team->setNbSelectedHome($faker->numberBetween(0, 6));
-            $team->setGame($faker->randomElement([null, $game]) );
+            foreach ($teamsData as $teamData) {
+                $team = new Team();
+                $team->setName($teamData['name']);
+                $team->setConference($teamData['conference']);
+                $team->setTrigram($teamData['trigram']);
+                $team->setCreatedAt($createdAt);
+                $team->setNbSelectedAway($faker->numberBetween(0, 6));
+                $team->setNbSelectedHome($faker->numberBetween(0, 6));
 
-            // $assignedCount = 0;
-            // // Parcourez les équipes
-            //     if ($assignedCount < 2) {
-            //         // Attribuez le jeu à cette équipe
-            //         $team->setGame($game);
-            //         $assignedCount++; // Incrémentez le compteur
-            //     } else {
-            //         // Si vous avez attribué un jeu à deux équipes, sortez de la boucle
-            //         break;
-            //     }
-            // }
-            $manager->persist($team);
-        }        
-
+                $manager->persist($team);
+            }        
+      
 
         // SR Prediction
-        foreach ($users as $user) {
-            $srPrediction = new Srprediction();
-            $srPrediction->setGame($game);
-            $srPrediction->setUser($user);
-            $srPrediction->setPredictedWinnigTeam($teamsData[$faker->numberBetween(0, count($teamsData) - 1)]['name']);
-            $srPrediction->setPredictedPointDifference($faker->numberBetween(5, 30));
-            $srPrediction->setValidationStatus($faker->randomElement(['Saved', 'Validated', 'Published']));
-            $srPrediction->setPointScored(0);
-            $srPrediction->setBonusPointsErned(0);
-            $srPrediction->setBonusBookie(0);
-            $srPrediction->setCreatedAt($createdAt);
+            foreach ($users as $user) {
+                foreach ($games as $game) {
 
-            $manager->persist($srPrediction);
-        }
-            $manager->flush();
+                    $srPrediction = new Srprediction();
+
+                    $srPrediction->setGame($game);
+
+                    $srPrediction->setUser($user);
+                    $srPrediction->setPredictedWinnigTeam($teamsData[$faker->numberBetween(0, count($teamsData) - 1)]['name']);
+                    $srPrediction->setPredictedPointDifference($faker->numberBetween(5, 30));
+                    $srPrediction->setValidationStatus($faker->randomElement(['Saved', 'Validated', 'Published']));
+                    $srPrediction->setPointScored(0);
+                    $srPrediction->setBonusPointsErned(0);
+                    $srPrediction->setBonusBookie(0);
+                    $srPrediction->setCreatedAt($createdAt);
+
+                    $manager->persist($srPrediction);
+                }
+            }
+
+        $manager->flush();
     }
 }
