@@ -234,20 +234,18 @@ class AppFixtures extends Fixture
 
         // Game
             $games = [];
-            for ($i = 1; $i <= 60; $i++) {
-                $game = new Game();
-                $game->setDateAndTimeOfMatch($faker->dateTimeBetween('now', '+1 years'));
+                for ($i = 1; $i <= 60; $i++) {
+                    $game = new Game();
+                    $game->setDateAndTimeOfMatch($faker->dateTimeBetween('now', '+1 years'));
 
-                // Choisissez un tour aléatoire parmi les tours créés
-                $randomRoundIndex = array_rand($rounds);
-                $randomRound = $rounds[$randomRoundIndex];
+                    // Choisissez un tour aléatoire parmi les tours créés
+                    $randomRoundIndex = array_rand($rounds);
+                    $randomRound = $rounds[$randomRoundIndex];
 
-                $game->setRound($randomRound); 
-                $game->setCreatedAt($createdAt);
-
-                $games[] = $game;
-                $manager->persist($game);
-            }
+                    $game->setRound($randomRound);
+                    $game->setCreatedAt($createdAt);
+                    $games[] = $game;
+                }
             
         // Team
             $teamsData = [
@@ -283,6 +281,7 @@ class AppFixtures extends Fixture
                 ['name' => 'Washington Wizards', 'conference' => 'Eastern', 'trigram' => 'WAS'],
             ];
 
+            
             foreach ($teamsData as $teamData) {
                 $team = new Team();
                 $team->setName($teamData['name']);
@@ -293,8 +292,8 @@ class AppFixtures extends Fixture
                 $team->setNbSelectedHome($faker->numberBetween(0, 6));
 
                 $manager->persist($team);
-            }        
-      
+            }
+                $manager->persist($game);
 
         // SR Prediction
             foreach ($users as $user) {
