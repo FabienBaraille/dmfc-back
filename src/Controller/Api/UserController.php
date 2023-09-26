@@ -2,71 +2,51 @@
 
 namespace App\Controller\Api;
 
-use App\Repository\UserRepository;
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
+use App\Entity\League;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 class UserController extends AbstractController
 {
     /**
-     * @Route("/api/user", name="app_api_user_login", methods={"GET"})
+     * @Route("/api/user/league", name="app_api_league_get_user_by_league", methods={"GET"})
      */
-    public function getUsers(UserRepository $userRepository): JsonResponse
+    public function getUsersByLeague(League $league = null,UserRepository $userRepository): JsonResponse
     {
-        $users = $userRepository->findAll();
-        return $this->json(['result' => $users], 200,[], ['groups' => 'get_login' ]);
-    }
-
-
-
-
-    /**
-     * @Route("/api/user/{id}", name="app_api_user_login", methods={"GET"})
-     */
-    public function getUserById(UserRepository $userRepository): JsonResponse
-    {
-
-        return $this->json($userRepository->findBy());
-    }
-
-
-
-
-
     
-    /**
-     * Create User
-     * 
-     * @Route("/api/user", name="app_api_user_login", methods={"POST"})
-     */
-    public function postLogin(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-    {
-        $jsonContent = $request->getContent();
-        $user = $serializer->deserialize($jsonContent, User::class, 'json');
-        $errors = $validator->validate($user);
-        if (count($errors) > 0) {
-
-            $errorMessages = [];
-             
-            foreach ($errors as $error) {
-               
-                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
-
+        if ($league === null) {
+            throw $this->createNotFoundException('Ressource non trouvée.');
         }
-        
-        $entityManager->persist($user);
-        $entityManager->flush();
+        return $this->json($userRepository->findByLeague($league), 200, [], ['groups' => 'get_login_league' ]);
+    }
 
+    /**
+     * GET users collection
+     * 
+     * @Route("/api/user", name="app_api_user", methods={"GET"})
+     */
+    public function getUserAll(UserRepository $userRepository): JsonResponse
+    {
+        // données à retourner
+        ;
+
+        return $this->json(
+            $user = $userRepository->findAll(),
+            
+            200,
+
+            [],
+            
+            ['groups' => 'get_login']
+        );
     }
 }

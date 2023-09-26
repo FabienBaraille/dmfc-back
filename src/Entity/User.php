@@ -17,31 +17,30 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"get_login"})
+     *  @Groups({"get_login","get_login_league"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"get_login"})
+     *  @Groups({"get_login","get_login_league"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login"})
+     *  @Groups({"get_login","get_login_league"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login"})
+     * @Groups({"get_login","get_login_league"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"get_login"})
      */
     private $role = [];
 
@@ -98,6 +97,8 @@ class User
     /**
      * @ORM\ManyToOne(targetEntity=League::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"get_login","get_login_league"})
+     * 
      */
     private $league;
 
