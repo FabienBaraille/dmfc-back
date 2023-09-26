@@ -64,7 +64,7 @@ class Srprediction
     private $User;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Game::class, inversedBy="srpredictions", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity=Game::class, inversedBy="srpredictions")
      * @ORM\JoinColumn(nullable=false)
      */
     private $Game;

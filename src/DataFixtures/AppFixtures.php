@@ -234,7 +234,7 @@ class AppFixtures extends Fixture
 
         // Game
             $games = [];
-                for ($i = 1; $i <= 60; $i++) {
+                for ($i = 1; $i <= 10; $i++) {
                     $game = new Game();
                     $game->setDateAndTimeOfMatch($faker->dateTimeBetween('now', '+1 years'));
 
@@ -245,8 +245,10 @@ class AppFixtures extends Fixture
                     $game->setRound($randomRound);
                     $game->setCreatedAt($createdAt);
                     $games[] = $game;
+                    $manager->persist($game);
+
                 }
-            
+
         // Team
             $teamsData = [
                 ['name' => 'Atlanta Hawks', 'conference' => 'Eastern', 'trigram' => 'ATL'],
@@ -281,41 +283,77 @@ class AppFixtures extends Fixture
                 ['name' => 'Washington Wizards', 'conference' => 'Eastern', 'trigram' => 'WAS'],
             ];
 
-            
-            foreach ($teamsData as $teamData) {
-                $team = new Team();
-                $team->setName($teamData['name']);
-                $team->setConference($teamData['conference']);
-                $team->setTrigram($teamData['trigram']);
-                $team->setCreatedAt($createdAt);
-                $team->setNbSelectedAway($faker->numberBetween(0, 6));
-                $team->setNbSelectedHome($faker->numberBetween(0, 6));
+            // Créer deux tableaux séparés pour les conférences Est et Ouest
+            $teamsEastern = array_filter($teamsData, function ($teamData) {
+                return $teamData['conference'] === 'Eastern';
+            });
 
-                $manager->persist($team);
-            }
-                $manager->persist($game);
+            $teamsWestern = array_filter($teamsData, function ($teamData) {
+                return $teamData['conference'] === 'Western';
+            });
 
-        // SR Prediction
-            foreach ($users as $user) {
-                foreach ($games as $game) {
+            // Boucle pour associer les équipes aux matchs
+            foreach ($games as $game) {
+                // Choisissez aléatoirement une conférence (Est ou Ouest)
+                $conference = ($faker->boolean) ? 'Eastern' : 'Western';
 
-                    $srPrediction = new Srprediction();
+                // Sélectionnez deux équipes de la conférence choisie au hasard
+                $selectedTeams = [];
+                if ($conference === 'Eastern') {
+                    $selectedTeams = array_rand($teamsEastern, 2);
+                } else {
+                    $selectedTeams = array_rand($teamsWestern, 2);
+                }
 
-                    $srPrediction->setGame($game);
+                foreach ($selectedTeams as $teamIndex) {
+                    $teamData = ($conference === 'Eastern') ? $teamsEastern[$teamIndex] : $teamsWestern[$teamIndex];
 
-                    $srPrediction->setUser($user);
-                    $srPrediction->setPredictedWinnigTeam($teamsData[$faker->numberBetween(0, count($teamsData) - 1)]['name']);
-                    $srPrediction->setPredictedPointDifference($faker->numberBetween(5, 30));
-                    $srPrediction->setValidationStatus($faker->randomElement(['Saved', 'Validated', 'Published']));
-                    $srPrediction->setPointScored(0);
-                    $srPrediction->setBonusPointsErned(0);
-                    $srPrediction->setBonusBookie(0);
-                    $srPrediction->setCreatedAt($createdAt);
+                    $team = new Team();
+                    $team->setName($teamData['name']);
+                    $team->setConference($teamData['conference']);
+                    $team->setTrigram($teamData['trigram']);
+                    $team->setCreatedAt($createdAt);
+                    $team->setNbSelectedAway($faker->numberBetween(0, 6));
+                    $team->setNbSelectedHome($faker->numberBetween(0, 6));
 
-                    $manager->persist($srPrediction);
+                    // Associez l'équipe au jeu en cours
+                    $team->addGame($game);
+                    $game->addTeam($team);
+
+                    $manager->persist($team);
                 }
             }
+                
 
+        // SR Prediction
+            // Boucle pour créer les prédictions
+            foreach ($users as $user) {
+                foreach ($games as $game) {
+                    // Obtenez la liste des équipes associées au jeu en cours
+                    $teamsInGame = $game->getTeam();
+
+                    // Vérifiez qu'il y a au moins deux équipes pour ce match
+                    if (count($teamsInGame) >= 2) {
+                        // Choisissez aléatoirement l'une des équipes du match comme predictedWinnigTeam
+                        $randomTeamIndex = $faker->numberBetween(0, count($teamsInGame) - 1);
+                        $predictedWinningTeam = $teamsInGame[$randomTeamIndex];
+
+                        $srPrediction = new Srprediction();
+                        $srPrediction->setGame($game);
+                        $srPrediction->setUser($user);
+                        $srPrediction->setPredictedWinnigTeam($predictedWinningTeam->getName());
+                        $srPrediction->setPredictedPointDifference($faker->numberBetween(5, 30));
+                        $srPrediction->setValidationStatus($faker->randomElement(['Saved', 'Validated', 'Published']));
+                        $srPrediction->setPointScored(0);
+                        $srPrediction->setBonusPointsErned(0);
+                        $srPrediction->setBonusBookie(0);
+                        $srPrediction->setCreatedAt($createdAt);
+
+                        $manager->persist($srPrediction);
+                    }
+                }
+            }
+            
         $manager->flush();
     }
 }
