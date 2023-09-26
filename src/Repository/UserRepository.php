@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\League;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -37,6 +38,22 @@ class UserRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * find all user by league (list), QB
+     * 
+     */
+    public function findByLeague(League $league)
+    {
+        $query = $this->createQueryBuilder('u')
+            ->join('u.league', 'l')
+            ->where('l = :league')
+            ->setParameter('league', $league)
+            ->orderBy('u.username', 'ASC')
+            ->getQuery();
+
+        return $query->getResult();
     }
 
 //    /**
