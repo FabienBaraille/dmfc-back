@@ -71,15 +71,18 @@ class Game
     private $round;
 
     /**
-     * @ORM\OneToMany(targetEntity=Team::class, mappedBy="game")
+     * @ORM\ManyToMany(targetEntity=Team::class, inversedBy="games")
      */
-    private $teams;
+    private $team;
 
     public function __construct()
     {
-        $this->srpredictions = new ArrayCollection();
-        $this->teams = new ArrayCollection();
+        $this->team = new ArrayCollection();
     }
+
+    
+
+    
 
     public function getId(): ?int
     {
@@ -227,16 +230,15 @@ class Game
     /**
      * @return Collection<int, Team>
      */
-    public function getTeams(): Collection
+    public function getTeam(): Collection
     {
-        return $this->teams;
+        return $this->team;
     }
 
     public function addTeam(Team $team): self
     {
-        if (!$this->teams->contains($team)) {
-            $this->teams[] = $team;
-            $team->setGame($this);
+        if (!$this->team->contains($team)) {
+            $this->team[] = $team;
         }
 
         return $this;
@@ -244,13 +246,11 @@ class Game
 
     public function removeTeam(Team $team): self
     {
-        if ($this->teams->removeElement($team)) {
-            // set the owning side to null (unless already changed)
-            if ($team->getGame() === $this) {
-                $team->setGame(null);
-            }
-        }
+        $this->team->removeElement($team);
 
         return $this;
     }
+
+    
+    
 }
