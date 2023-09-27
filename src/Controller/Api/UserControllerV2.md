@@ -18,41 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserController extends AbstractController
 {
     /**
-     * GET users collection
-     * 
-     * @Route("/api/user", name="app_api_user", methods={"GET"})
-     */
-    public function index(UserRepository $userRepository, SerializerInterface $serializer)
-    {
-        $users = $userRepository->findAll();
-
-        // Sérialisez la collection d'utilisateurs en utilisant les groupes de sérialisation définis dans l'entité User.
-        $jsonData = $serializer->serialize($users, 'json', ['groups' => 'get_login']);
-
-        return new JsonResponse($jsonData, 200, [], true);
-    } 
-
-    /**
-     * GET user by ID
-     *
-     * @Route("/api/user/{id}", name="app_api_user_by_id", methods={"GET"})
-     */
-    public function getUserById(UserRepository $userRepository, $id, SerializerInterface $serializer)
-    {
-        $user = $userRepository->find($id);
-
-        if (!$user) {
-            // L'utilisateur avec l'ID donné n'a pas été trouvé
-            return $this->json(['error' => 'User not found'], 404);
-        }
-
-        // Sérialisez l'objet User en utilisant les groupes de sérialisation définis dans l'entité User.
-        $jsonData = $serializer->serialize($user, 'json', ['groups' => 'get_login']);
-
-        return new JsonResponse($jsonData, 200, [], true);
-    }
-
-    /**
      * CREATE a new user
      *
      * @Route("/api/user", name="app_api_create_user", methods={"POST"})

@@ -2,11 +2,10 @@
 
 namespace App\Controller\Api;
 
-use App\Repository\UserRepository;
 use App\Repository\LeagueRepository;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
 
 class LeagueController extends AbstractController
 {
@@ -18,12 +17,25 @@ class LeagueController extends AbstractController
     public function getLeagueAll(LeagueRepository $leagueRepository): JsonResponse
     {
         return $this->json(
-            $league = $leagueRepository->findAll(),
+            $leagueRepository->findAll(),
             200,
             [],
             ['groups' => 'get_login_league']
         );
-
     }
 
+    /**
+     * @Route("/league/{id}/users", name="app_league_id_users")
+     */
+    public function users(LeagueRepository $leagueRepository, $id): JsonResponse
+    {
+        
+        return $this->json(
+            $leagueRepository->find($id)->getUsers(),
+            200,
+            [],
+            ['groups' => 'get_login_league']
+        );
+    }
 }
+

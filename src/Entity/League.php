@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\LeagueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,19 +17,19 @@ class League
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"get_login","get_login_league"})
+     * @Groups({"user_get_collection","get_login_league"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login","get_login_league"})
+     * @Groups({"user_get_collection","get_login_league"})
      */
     private $leagueName;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"get_login","get_login_league"})
+     * @Groups({"user_get_collection","get_login_league"})
      */
     private $leagueDescription;
 
