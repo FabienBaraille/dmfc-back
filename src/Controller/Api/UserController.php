@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 
 
 use App\Entity\User;
+use App\Entity\League;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,6 +59,12 @@ class UserController extends AbstractController
 
         $user = $serializer->deserialize($jsonContent, User::class,'json');
 
+        // Créez une nouvelle entité League et définissez la valeur de league_name
+        $league = new League();
+        $league->setLeagueName('Nom de la ligue'); // Remplacez 'Nom de la ligue' par la valeur souhaitée
+
+        // Associez la ligue à l'utilisateur
+        $user->setLeague($league);
         $errors = $validator->validate($user);
 
         if (count($errors) > 0) {

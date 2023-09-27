@@ -64,6 +64,7 @@ class League
         $this->users = new ArrayCollection();
         $this->rounds = new ArrayCollection();
         $this->news = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int

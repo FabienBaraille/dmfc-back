@@ -101,7 +101,7 @@ class User
     private $team;
 
     /**
-     * @ORM\ManyToOne(targetEntity=League::class, inversedBy="users")
+     * @ORM\ManyToOne(targetEntity=League::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"user_get_collection", "get_login"})
      */
