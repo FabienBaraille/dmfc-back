@@ -30,6 +30,7 @@ class League
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups({"get_login","get_login_league"})
      */
     private $leagueDescription;
 
