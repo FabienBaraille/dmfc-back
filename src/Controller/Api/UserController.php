@@ -18,10 +18,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserController extends AbstractController
 {
     /**
-     * GET users collection
-     *
-     * @Route("/api/user", name="app_api_user", methods={"GET"})
-     */
+    * GET users collection
+    *
+    * @Route("/api/user", name="app_api_user", methods={"GET"})
+    */
     public function getUserAll(UserRepository $userRepository): JsonResponse
     {
         return $this->json(
@@ -47,11 +47,11 @@ class UserController extends AbstractController
         );
     }
 
-        /**
-     * Create User
-     * 
-     * @Route("/api/user", name="app_api_users_post", methods={"POST"})
-     */
+    /**
+    * Create User
+    * 
+    * @Route("/api/user", name="app_api_users_post", methods={"POST"})
+    */
     public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
         $jsonContent = $request->getContent();
@@ -82,5 +82,62 @@ class UserController extends AbstractController
             ['groups' => ['get_login']]
         );
     }   
+
+    /**
+    * Delete User
+    * 
+    * @Route("/api/user/{id}", name="app_api_user_delete", methods={"DELETE"})
+    */
+    public function deleteUser(EntityManagerInterface $entityManager, $id): JsonResponse
+
+    {
+        $user = $entityManager->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return $this->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+    
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+    * Update User
+    * 
+    * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
+    */
+    public function updateUser(Request $request, User $user, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $jsonContent = $request->getContent();
+
+
+        $updatedUser = $serializer->deserialize($jsonContent, User::class, 'json');
+
+        $errors = $validator->validate($updatedUser);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $entityManager->flush();
+
+        return $this->json(
+            $user,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['get_login']]
+        );
+    }
+
+
+
 }
 

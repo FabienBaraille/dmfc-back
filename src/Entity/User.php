@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -28,7 +29,7 @@ class User
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"user_get_item", "get_login"})
+     * @Groups({"get_login"})
      */
     private $password;
 
@@ -46,7 +47,7 @@ class User
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"user_get_collection", "user_get_item","get_login_league"})
+     * @Groups({"user_get_collection","get_login_league"})
      */
     private $title;
 
@@ -116,6 +117,7 @@ class User
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
         $this->rounds = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
 
