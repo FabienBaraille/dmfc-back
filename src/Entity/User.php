@@ -16,43 +16,41 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"get_login"})
+     * @Groups({"leagues_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"get_login","get_login_league"})
+     * @Groups({"leagues_get_collection"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"get_login_league"})
+     * @Groups({"leagues_get_collection"})
      */
     private $role = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"get_login_league"})
+     * @Groups({"leagues_get_collection"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"get_login_league"})
+     * @Groups({"leagues_get_collection"})
      */
     private $score;
 
@@ -63,7 +61,7 @@ class User
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"get_login_league"})
+     * @Groups({"leagues_get_collection"})
      */
     private $position;
 
