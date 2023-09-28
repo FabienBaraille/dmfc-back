@@ -18,19 +18,19 @@ class League
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_collection","get_login_league"}, {"leagues_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
      */
     private $leagueName;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
      */
     private $leagueDescription;
 
@@ -64,6 +64,7 @@ class League
         $this->users = new ArrayCollection();
         $this->rounds = new ArrayCollection();
         $this->news = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int

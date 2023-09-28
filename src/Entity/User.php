@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,13 +17,13 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
      */
     private $username;
 
@@ -33,24 +34,25 @@ class User
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Groups({"user_get_item", "get_login"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item","get_login_league", "get_login", "leagues_get_collection"})
      */
     private $role = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"user_get_item","get_login_league", "leagues_get_collection"})
      */
     private $score;
 
@@ -67,6 +69,7 @@ class User
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"user_get_collection", "user_get_item"})
      */
     private $seasonPlayed;
 
@@ -92,13 +95,14 @@ class User
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
+     * @Groups({"user_get_collection","user_get_item", "get_login"})
      */
     private $team;
 
     /**
-     * @ORM\ManyToOne(targetEntity=League::class, inversedBy="users")
+     * @ORM\ManyToOne(targetEntity=League::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_collection", "get_login"})
      */
     private $league;
 
