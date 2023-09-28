@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,4 +19,20 @@ class GameController extends AbstractController
             'path' => 'src/Controller/GameController.php',
         ]);
     }
+
+        /**
+     * @Route("/test/user/{id}", name="app_game_test")
+     */
+    public function testuser(): JsonResponse
+    {
+
+        $user = new \App\Entity\User();
+        dd($user);
+
+        return $this->json([
+            'message' => 'Welcome to your new controller!',
+            'path' => 'src/Controller/GameController.php',
+        ]);
+    }
+
 }

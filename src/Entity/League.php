@@ -18,18 +18,19 @@ class League
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"get_login","get_login_league"})
+     * @Groups({"get_league"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login","get_login_league"})
+     * @Groups({"get_league"})
      */
     private $leagueName;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups({"get_league"})
      */
     private $leagueDescription;
 
@@ -45,6 +46,7 @@ class League
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="league")
+     * @Groups({"get_league"})
      */
     private $users;
 

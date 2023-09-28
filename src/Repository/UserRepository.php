@@ -40,21 +40,7 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * find all user by league (list), QB
-     * 
-     */
-    public function findByLeague(League $league)
-    {
-        $query = $this->createQueryBuilder('u')
-            ->join('u.league', 'l')
-            ->where('l = :league')
-            ->setParameter('league', $league)
-            ->orderBy('u.username', 'ASC')
-            ->getQuery();
-
-        return $query->getResult();
-    }
+    
 
 //    /**
 //     * @return User[] Returns an array of User objects
