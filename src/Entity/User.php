@@ -17,19 +17,18 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "get_login"})
+     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user_get_collection", "user_get_item", "get_login"})
+     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login"})
      */
     private $password;
 
@@ -41,19 +40,19 @@ class User
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"user_get_collection", "user_get_item","get_login_league", "get_login"})
+     * @Groups({"user_get_collection", "user_get_item","get_login_league", "get_login", "leagues_get_collection"})
      */
     private $role = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"user_get_collection","get_login_league"})
+     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item","get_login_league"})
+     * @Groups({"user_get_item","get_login_league", "leagues_get_collection"})
      */
     private $score;
 
@@ -64,7 +63,7 @@ class User
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"get_login_league"})
+     * @Groups({"leagues_get_collection"})
      */
     private $position;
 

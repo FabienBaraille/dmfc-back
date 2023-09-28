@@ -48,74 +48,73 @@ class UserController extends AbstractController
         );
     }
 
-/**
- * Create User
- *
- * @Route("/api/user", name="app_api_user_post", methods={"POST"})
- */
-public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-{
-    $jsonContent = $request->getContent();
-    $userData = json_decode($jsonContent, true);
+  /**
+   * Create User
+   *
+   * @Route("/api/user", name="app_api_user_post", methods={"POST"})
+   */
+  public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+  {
+      $jsonContent = $request->getContent();
+      $userData = json_decode($jsonContent, true);
 
-    if (!isset($userData['league'])) {
-        return $this->json(['error' => 'Le champ "league" est requis.'], Response::HTTP_BAD_REQUEST);
-    }
+      if (!isset($userData['league'])) {
+          return $this->json(['error' => 'Le champ "league" est requis.'], Response::HTTP_BAD_REQUEST);
+      }
 
-    $leagueId = $userData['league'];
+      $leagueId = $userData['league'];
 
-    $league = $entityManager->getRepository(League::class)->find($leagueId);
+      $league = $entityManager->getRepository(League::class)->find($leagueId);
 
-    $user = $serializer->deserialize($jsonContent, User::class, 'json');
-    $user->setLeague($league);
+      $user = $serializer->deserialize($jsonContent, User::class, 'json');
+      $user->setLeague($league);
 
-    $errors = $validator->validate($user);
+      $errors = $validator->validate($user);
 
-    $user->setCreatedAt(new \DateTime('now'));
+      $user->setCreatedAt(new \DateTime('now'));
 
-    if (count($errors) > 0) {
-        $errorMessages = [];
+      if (count($errors) > 0) {
+          $errorMessages = [];
 
-        foreach ($errors as $error) {
-            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-        }
+          foreach ($errors as $error) {
+              $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+          }
 
-        return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
-    }
+          return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+      }
 
-    $entityManager->persist($user);
-    $entityManager->flush();
+      $entityManager->persist($user);
+      $entityManager->flush();
 
-    return $this->json(
-        $user,
-        Response::HTTP_CREATED,
-        [
-            'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-        ],
-        ['groups' => ['get_login']]
-    );
-}
+      return $this->json(
+          $user,
+          Response::HTTP_CREATED,
+          [
+              'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
+          ],
+          ['groups' => ['get_login']]
+      );
+  }
 
 
-    /**
-    * Delete User
-    * 
-    * @Route("/api/user/{id}", name="app_api_user_delete", methods={"DELETE"})
-    */
-    public function deleteUser(EntityManagerInterface $entityManager, $id): JsonResponse
+      /**
+      * Delete User
+      * 
+      * @Route("/api/user/{id}", name="app_api_user_delete", methods={"DELETE"})
+      */
+      public function deleteUser(EntityManagerInterface $entityManager, $id): JsonResponse
+      {
+          $user = $entityManager->getRepository(User::class)->find($id);
 
-    {
-        $user = $entityManager->getRepository(User::class)->find($id);
+          if (!$user) {
+              return $this->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+          }
 
-        if (!$user) {
-            return $this->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-    
-        $entityManager->remove($user);
-        $entityManager->flush();
+          $entityManager->remove($user);
+          $entityManager->flush();
 
-        return $this->json(null, Response::HTTP_NO_CONTENT);
-    }
+          return $this->json(null, Response::HTTP_NO_CONTENT);
+      }
 
     /**
     * Update User
@@ -125,7 +124,6 @@ public function postUser(Request $request, SerializerInterface $serializer, Enti
     public function updateUser(Request $request, User $user, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $jsonContent = $request->getContent();
-
 
         $updatedUser = $serializer->deserialize($jsonContent, User::class, 'json');
 
@@ -171,6 +169,5 @@ public function postUser(Request $request, SerializerInterface $serializer, Enti
             ['groups' => ['get_login']]
         );
     }
-
 }
 
