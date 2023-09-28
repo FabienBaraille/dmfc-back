@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\League;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -40,19 +41,6 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * find all user by league (list), QB
-     * 
-     */
-    public function findByLeague($league)
-    {
-        $query = $this->createQueryBuilder('u')
-            ->where('u.league = :leagueId')
-            ->setParameter('leagueId', $league)
-            ->getQuery();
-    
-        return $query->getResult();
-    }
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
