@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\League;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -39,8 +40,6 @@ class UserRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
-    
 
 //    /**
 //     * @return User[] Returns an array of User objects

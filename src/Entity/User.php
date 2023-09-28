@@ -21,13 +21,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     *  @Groups({"get_login"})
+     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
      */
     private $username;
 
@@ -43,36 +43,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_collection", "user_get_item","get_login_league", "get_login", "leagues_get_collection"})
      */
     private $roles = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_item","get_login_league", "leagues_get_collection"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"get_login"})
-     */
+      */
     private $oldPosition;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_collection"})
      */
     private $position;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_collection", "user_get_item"})
      */
     private $seasonPlayed;
 
@@ -98,13 +98,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
+     * @Groups({"user_get_collection","user_get_item", "get_login"})
      */
     private $team;
 
     /**
      * @ORM\ManyToOne(targetEntity=League::class, cascade={"persist"},inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_collection", "get_login"})
      */
     private $league;
 
