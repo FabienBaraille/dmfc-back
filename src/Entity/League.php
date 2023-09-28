@@ -46,6 +46,7 @@ class League
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="league")
+     * @Groups({"get_league"})
      */
     private $users;
 

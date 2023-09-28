@@ -7,11 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity("username")
  */
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -22,7 +26,7 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=60)
+     * @ORM\Column(type="string", length=60, unique=true)
      * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
      */
     private $username;
@@ -34,7 +38,6 @@ class User
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"user_get_item", "get_login"})
      */
     private $email;
 
@@ -42,7 +45,7 @@ class User
      * @ORM\Column(type="json", nullable=true)
      * @Groups({"user_get_collection", "user_get_item","get_login_league", "get_login", "leagues_get_collection"})
      */
-    private $role = [];
+    private $roles = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
@@ -58,7 +61,7 @@ class User
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     */
+      */
     private $oldPosition;
 
     /**
@@ -100,7 +103,7 @@ class User
     private $team;
 
     /**
-     * @ORM\ManyToOne(targetEntity=League::class, inversedBy="users", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity=League::class, cascade={"persist"},inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"user_get_collection", "get_login"})
      */
@@ -113,6 +116,7 @@ class User
 
     public function __construct()
     {
+        $this->createdAt = new \DateTime();
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
         $this->rounds = new ArrayCollection();
@@ -136,6 +140,9 @@ class User
         return $this;
     }
 
+    /**
+     * @return string the hashed password for this user
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -146,6 +153,17 @@ class User
         $this->password = $password;
 
         return $this;
+    }
+
+    /**
+     * Returning a salt is only needed if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
     }
 
     public function getEmail(): ?string
@@ -160,14 +178,20 @@ class User
         return $this;
     }
 
-    public function getRole(): ?array
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): ?array
     {
-        return $this->role;
+        $roles = $this->roles;
+        $roles[] = 'ROLE_JOUEUR';
+
+        return array_unique($roles);
     }
 
-    public function setRole(?array $role): self
+    public function setRoles(?array $roles): self
     {
-        $this->role = $role;
+        $this->roles = $roles;
 
         return $this;
     }
@@ -369,6 +393,23 @@ class User
 
         return $this;
     }
+    /**
+     * The public representation of the user (e.g. a username, an email address, etc.)
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+    return (string) $this->username;
+    }
 
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
     
 }

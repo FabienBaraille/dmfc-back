@@ -167,4 +167,3 @@ class LeagueController extends AbstractController
         );
     }
 }
-
