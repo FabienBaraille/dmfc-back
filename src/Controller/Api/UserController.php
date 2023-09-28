@@ -169,52 +169,5 @@ class UserController extends AbstractController
             [],
             ['groups' => ['get_login']]
         );
-
-    }
-    /**
-     *GET users by id*
-    *@Route("/api/user/{id}", name="app_api_user_by_id", methods={"GET"})
-    */
-    public function getUserById(User $user):JsonResponse
-    {
-    return $this->json(
-        $user,
-        200,
-        [],
-        ['groups' => 'get_login']
-    );
-
-    }
-    /**
-    * Create User
-    *
-    * @Route("/api/user", name="app_api_users_post", methods={"POST"})
-    */
-    public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-    {
-        $jsonContent = $request->getContent();
-        $user = $serializer->deserialize($jsonContent, User::class,'json');
-        $league = new League();
-        $league->setLeagueName('Nom de la ligue');
-        $league->setCreatedAt(new \DateTime('now'));
-        $user->setLeague($league);
-        $errors = $validator->validate($user);
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-            }
-            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-        $entityManager->persist($user);
-        $entityManager->flush();
-        return $this->json(
-            $user,
-            Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-            ],
-            ['groups' => ['get_login']]
-        );
     }
 }
