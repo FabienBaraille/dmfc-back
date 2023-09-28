@@ -79,7 +79,7 @@ class AppFixtures extends Fixture
             $userA = new User();
             $userA->setUsername('admin');
             $userA->setEmail('admin@admin.com');
-            $userA->setRole(['ROLE_ADMIN']);
+            $userA->setRoles(['ROLE_ADMIN']);
             $userA->setPassword('admin');
             $userA->setTitle("C'est moi, Fabien! Le super Admin");
             $userA->setLeague($league);
@@ -91,7 +91,7 @@ class AppFixtures extends Fixture
             $userDMFC = new User;
             $userDMFC->setUsername('DMFC');
             $userDMFC->setEmail('dmfc@dmfc.com');
-            $userDMFC->setRole(['ROLE_DMFC']);
+            $userDMFC->setRoles(['ROLE_DMFC']);
             $userDMFC->setPassword('dmfc');
             $userDMFC->setTitle("C'est moi, le maître du jeu");
             $userDMFC->setSeasonPlayed("3");
@@ -104,7 +104,7 @@ class AppFixtures extends Fixture
             $userDMFC2 = new User;
             $userDMFC2->setUsername('DMFC2');
             $userDMFC2->setEmail('dmfc2@dmfc2.com');
-            $userDMFC2->setRole(['ROLE_DMFC']);
+            $userDMFC2->setRoles(['ROLE_DMFC']);
             $userDMFC2->setPassword('dmfc2');
             $userDMFC2->setTitle("C'est moi, le maître du jeu N°2");
             $userDMFC2->setSeasonPlayed("3");
@@ -119,7 +119,7 @@ class AppFixtures extends Fixture
                 $user = new User();
                 $user->setUsername("joueur$i");
                 $user->setEmail("joueur$i@example.com");
-                $user->setRole(['ROLE_JOUEUR']);
+                $user->setRoles(['ROLE_JOUEUR']);
                 $user->setPassword("joueur$i");
                 $user->setTitle("C'est moi, le joueur $i");
                 $user->setScore($faker->numberBetween(10, 50));
@@ -137,7 +137,7 @@ class AppFixtures extends Fixture
                 $user2 = new User();
                 $user2->setUsername("joueur$i");
                 $user2->setEmail("joueur$i@example.com");
-                $user2->setRole(['ROLE_JOUEUR']);
+                $user2->setRoles(['ROLE_JOUEUR']);
                 $user2->setPassword("joueur$i");
                 $user2->setTitle("C'est moi, le joueur $i");
                 $user2->setScore($faker->numberBetween(10, 50));
