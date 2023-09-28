@@ -47,7 +47,7 @@ class LeagueController extends AbstractController
     }
 
     /**
-     * @Route("/api/league/{id}/users", name="app_league_id_users", methods={"GET"})
+     * @Route("/api/leagues/{id}/users", name="app_league_id_users", methods={"GET"})
      */
     public function getUsersByLeague(LeagueRepository $leagueRepository, $id): JsonResponse
     {
@@ -115,6 +115,52 @@ class LeagueController extends AbstractController
         return $this->json(
             null,
             Response::HTTP_NO_CONTENT,
+        );
+    }
+
+    /**
+    * Update League
+    * 
+    * @Route("/api/leagues/{id}", name="app_api_league_update", methods={"PUT"})
+    */
+    public function updateLeague(Request $request, League $league, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $jsonContent = $request->getContent();
+
+
+        $updatedLeague = $serializer->deserialize($jsonContent, League::class, 'json');
+
+        $errors = $validator->validate($updatedLeague);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // Vérifiez si les champs sont définis avant de les mettre à jour
+        $newLeagueName = $updatedLeague->getLeagueName();
+        if ($newLeagueName !== null) {
+            $league->setLeagueName($newLeagueName);
+        }
+
+        $newLeagueDescription = $updatedLeague->getLeagueDescription();
+        if ($newLeagueDescription !== null) {
+            $league->setLeagueDescription($newLeagueDescription);
+        }
+
+        $entityManager->persist($league);
+        $entityManager->flush();
+
+        return $this->json(
+            $league,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['leagues_get_collection']]
         );
     }
 }
