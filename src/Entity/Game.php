@@ -78,6 +78,7 @@ class Game
     public function __construct()
     {
         $this->team = new ArrayCollection();
+        $this->srpredictions = new ArrayCollection();
     }
 
     
