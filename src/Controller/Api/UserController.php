@@ -48,47 +48,52 @@ class UserController extends AbstractController
         );
     }
 
-    /**
-    * Create User
-    * 
-    * @Route("/api/user", name="app_api_users_post", methods={"POST"})
-    */
-    public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-    {
-        $jsonContent = $request->getContent();
+/**
+ * Create User
+ *
+ * @Route("/api/user", name="app_api_user_post", methods={"POST"})
+ */
+public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+{
+    $jsonContent = $request->getContent();
+    $userData = json_decode($jsonContent, true);
 
-        $user = $serializer->deserialize($jsonContent, User::class,'json');
+    if (!isset($userData['league'])) {
+        return $this->json(['error' => 'Le champ "league" est requis.'], Response::HTTP_BAD_REQUEST);
+    }
 
-        // Créez une nouvelle entité League et définissez la valeur de league_name
-        $league = new League();
-        $league->setLeagueName('Nom de la ligue'); // Remplacez 'Nom de la ligue' par la valeur souhaitée
+    $leagueId = $userData['league'];
 
-        // Associez la ligue à l'utilisateur
-        $user->setLeague($league);
-        $errors = $validator->validate($user);
+    $league = $entityManager->getRepository(League::class)->find($leagueId);
 
-        if (count($errors) > 0) {
-            $errorMessages = [];
+    $user = $serializer->deserialize($jsonContent, User::class, 'json');
+    $user->setLeague($league);
 
-            foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-            }
-            
-            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+    $errors = $validator->validate($user);
+
+    if (count($errors) > 0) {
+        $errorMessages = [];
+
+        foreach ($errors as $error) {
+            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
         }
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
 
-        return $this->json(
-            $user,
-            Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-            ],
-            ['groups' => ['get_login']]
-        );
-    }   
+    $entityManager->persist($user);
+    $entityManager->flush();
+
+    return $this->json(
+        $user,
+        Response::HTTP_CREATED,
+        [
+            'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
+        ],
+        ['groups' => ['get_login']]
+    );
+}
+
 
     /**
     * Delete User
@@ -134,6 +139,27 @@ class UserController extends AbstractController
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+        $newUsername = $updatedUser->getUsername();
+        if ($newUsername !== null) {
+            $user->setUserName($newUsername);
+        }
+
+        $newPassword = $updatedUser->getPassword();
+        if ($newPassword !== null) {
+            $user->setPassword($newPassword);
+        }
+
+        $newEmail = $updatedUser->getEmail();
+        if ($newEmail !== null) {
+            $user->setEmail($newEmail);
+        }
+
+        $newTeam = $updatedUser->getTeam();
+        if ($newTeam !== null) {
+            $user->setTeam($newTeam);
+        }
+
+        $entityManager->persist($user);
         $entityManager->flush();
 
         return $this->json(
@@ -143,8 +169,6 @@ class UserController extends AbstractController
             ['groups' => ['get_login']]
         );
     }
-
-
 
 }
 
