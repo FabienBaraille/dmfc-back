@@ -33,13 +33,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"get_login"})
      */
     private $email;
 
@@ -51,16 +49,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
+     * @Groups({"get_login"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"get_login"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"get_login"})
      */
     private $oldPosition;
 
@@ -71,6 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"get_login"})
      */
     private $seasonPlayed;
 
