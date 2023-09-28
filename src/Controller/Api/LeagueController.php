@@ -71,6 +71,8 @@ class LeagueController extends AbstractController
 
         $league = $serializer->deserialize($jsonContent, League::class,'json');
 
+        $league->setCreatedAt(new \DateTime('now'));
+
         $errors = $validator->validate($league);
 
         if (count($errors) > 0) {
@@ -132,6 +134,8 @@ class LeagueController extends AbstractController
 
         $errors = $validator->validate($updatedLeague);
 
+        $league->setUpdatedAt(new \DateTime('now'));
+        
         if (count($errors) > 0) {
             $errorMessages = [];
 
