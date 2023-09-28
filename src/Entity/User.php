@@ -117,7 +117,6 @@ class User
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
         $this->rounds = new ArrayCollection();
-        $this->createdAt = new \DateTime();
     }
 
 

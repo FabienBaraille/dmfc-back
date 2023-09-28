@@ -71,6 +71,8 @@ public function postUser(Request $request, SerializerInterface $serializer, Enti
 
     $errors = $validator->validate($user);
 
+    $user->setCreatedAt(new \DateTime('now'));
+
     if (count($errors) > 0) {
         $errorMessages = [];
 
