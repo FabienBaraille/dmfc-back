@@ -30,7 +30,7 @@ security:
             logout:
                 path: app_logout
                 # where to redirect after logout
-                # target: app_any_route
+                # target: app_api_user
             
         api:
             pattern:   ^/api
@@ -42,7 +42,7 @@ security:
     access_control:
          - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/profile, roles: ROLE_USER }
-         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+         - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/leagues, roles: PUBLIC_ACCESS }
          - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
 
