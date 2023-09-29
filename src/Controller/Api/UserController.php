@@ -2,20 +2,21 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\League;
-use App\Entity\User;
-use App\Repository\UserRepository;
+use id;
 use DateTime;
+use App\Entity\User;
+use App\Entity\League;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Serializer\SerializerInterface;
-use id;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserController extends AbstractController
 {
@@ -52,50 +53,68 @@ class UserController extends AbstractController
   /**
    * Create User
    *
-   * @Route("/api/user", name="app_api_user_post", methods={"POST"})
+   * @Route("/api/user/new", name="app_api_user_post", methods={"POST"})
    */
-  public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-  {
-      $jsonContent = $request->getContent();
-      $userData = json_decode($jsonContent, true);
+  public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
+{
+    $jsonContent = $request->getContent();
+    $userData = json_decode($jsonContent, true);
 
-      if (!isset($userData['league'])) {
-          return $this->json(['error' => 'Le champ "league" est requis.'], Response::HTTP_BAD_REQUEST);
-      }
+    if (!isset($userData['league'])) {
+        return $this->json(['error' => 'Le champ "ligue" est requis.'], Response::HTTP_BAD_REQUEST);
+    }
 
-      $leagueId = $userData['league'];
+    $leagueId = $userData['league'];
 
-      $league = $entityManager->getRepository(League::class)->find($leagueId);
+    $league = $entityManager->getRepository(League::class)->find($leagueId);
 
-      $user = $serializer->deserialize($jsonContent, User::class, 'json');
-      $user->setLeague($league);
+    if (!$league) {
+        return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
+    }
 
-      $errors = $validator->validate($user);
+    // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
+    $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
+    if ($existingUser) {
+        return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
+    }
 
-      $user->setCreatedAt(new \DateTime('now'));
+    $existingEmail = $userRepository->findOneBy(['email' => $userData['email']]);
+    if ($existingEmail) {
+        return $this->json(['error' => 'Email déjà utilisé.'], Response::HTTP_CONFLICT);
+    }
 
-      if (count($errors) > 0) {
-          $errorMessages = [];
+    $user = $serializer->deserialize($jsonContent, User::class, 'json');
+    $user->setLeague($league);
 
-          foreach ($errors as $error) {
-              $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-          }
+    // Hasher le mot de passe avant la sauvegarde
+    $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+    $user->setPassword($hashedPassword);
 
-          return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
-      }
+    $errors = $validator->validate($user);
 
-      $entityManager->persist($user);
-      $entityManager->flush();
+    $user->setCreatedAt(new \DateTime('now'));
 
-      return $this->json(
-          $user,
-          Response::HTTP_CREATED,
-          [
-              'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-          ],
-          ['groups' => ['get_login']]
-      );
-  }
+    if (count($errors) > 0) {
+        $errorMessages = [];
+
+        foreach ($errors as $error) {
+            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+        }            
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    $entityManager->persist($user);
+    $entityManager->flush();
+
+        return $this->json(
+            $user,
+            Response::HTTP_CREATED,
+            [
+                'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
+            ],
+            ['groups' => ['get_login']]
+        );
+}
 
 
       /**
@@ -122,12 +141,19 @@ class UserController extends AbstractController
     * 
     * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
     */
-    public function updateUser(Request $request, User $user, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    public function updateUser(UserRepository $userRepository, Request $request, User $user, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $jsonContent = $request->getContent();
-
+        $userData = json_decode($jsonContent, true);
+        
         $updatedUser = $serializer->deserialize($jsonContent, User::class, 'json');
 
+    // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
+    $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
+    if ($existingUser) {
+        return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
+    }
+        
         $errors = $validator->validate($updatedUser);
 
         if (count($errors) > 0) {
