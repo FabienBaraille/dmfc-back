@@ -97,7 +97,7 @@ class UserController extends AbstractController
     $entityManager->persist($user);
     $entityManager->flush();
 
-    if ($request->isXmlHttpRequest()) {
+    /* if ($request->isXmlHttpRequest()) {
         // Réponse JSON pour l'API en cas de succès
         return $this->json(
             $user,
@@ -110,7 +110,7 @@ class UserController extends AbstractController
     } else {
         // Redirection vers la liste des utilisateurs pour l'interface Web
         return $this->redirectToRoute('app_api_user', [], Response::HTTP_SEE_OTHER);
-    }
+    } */
 }
 
 
