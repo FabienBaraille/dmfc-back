@@ -55,18 +55,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item","get_login_league", "leagues_get_collection"})
+     * @Groups({"user_get_item","get_login_league", "leagues_get_collection","user_get_collection"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"user_get_collection"})
       */
     private $oldPosition;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection"})
+     * @Groups({"leagues_get_collection","user_get_collection"})
      */
     private $position;
 
@@ -184,7 +185,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): ?array
     {
         $roles = $this->roles;
-        $roles[] = 'ROLE_JOUEUR';
+        // $roles[] = 'ROLE_JOUEUR';
 
         return array_unique($roles);
     }
