@@ -112,7 +112,7 @@ class UserController extends AbstractController
             [
                 'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
             ],
-            ['groups' => ['get_login']]
+            ['groups' => ['user_get_item']]
         );
 }
 
@@ -193,7 +193,7 @@ class UserController extends AbstractController
             $user,
             Response::HTTP_OK,
             [],
-            ['groups' => ['get_login']]
+            ['groups' => ['user_get_item']]
         );
     }
 }
