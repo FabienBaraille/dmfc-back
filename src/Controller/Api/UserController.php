@@ -2,20 +2,21 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\League;
-use App\Entity\User;
-use App\Repository\UserRepository;
+use id;
 use DateTime;
+use App\Entity\User;
+use App\Entity\League;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Serializer\SerializerInterface;
-use id;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserController extends AbstractController
 {
@@ -54,48 +55,63 @@ class UserController extends AbstractController
    *
    * @Route("/api/login", name="app_api_user_post", methods={"POST"})
    */
-  public function postUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-  {
-      $jsonContent = $request->getContent();
-      $userData = json_decode($jsonContent, true);
+  public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
+{
+    $jsonContent = $request->getContent();
+    $userData = json_decode($jsonContent, true);
 
-      if (!isset($userData['league'])) {
-          return $this->json(['error' => 'Le champ "league" est requis.'], Response::HTTP_BAD_REQUEST);
-      }
+    if (!isset($userData['league'])) {
+        return $this->json(['error' => 'Le champ "league" est requis.'], Response::HTTP_BAD_REQUEST);
+    }
 
-      $leagueId = $userData['league'];
+    $leagueId = $userData['league'];
 
-      $league = $entityManager->getRepository(League::class)->find($leagueId);
+    $league = $entityManager->getRepository(League::class)->find($leagueId);
 
-      $user = $serializer->deserialize($jsonContent, User::class, 'json');
-      $user->setLeague($league);
+    $user = $serializer->deserialize($jsonContent, User::class, 'json');
+    $user->setLeague($league);
 
-      $errors = $validator->validate($user);
+    // Hasher le mot de passe avant la sauvegarde
+    $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+    $user->setPassword($hashedPassword);
 
-      $user->setCreatedAt(new \DateTime('now'));
+    $errors = $validator->validate($user);
 
-      if (count($errors) > 0) {
-          $errorMessages = [];
+    $user->setCreatedAt(new \DateTime('now'));
 
-          foreach ($errors as $error) {
-              $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-          }
+    if (count($errors) > 0) {
+        $errorMessages = [];
 
-          return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
-      }
+        foreach ($errors as $error) {
+            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+        }
 
-      $entityManager->persist($user);
-      $entityManager->flush();
+        if ($request->isXmlHttpRequest()) {
+            
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } else {
+            
+        }
+    }
 
-      return $this->json(
-          $user,
-          Response::HTTP_CREATED,
-          [
-              'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-          ],
-          ['groups' => ['get_login']]
-      );
-  }
+    $entityManager->persist($user);
+    $entityManager->flush();
+
+    if ($request->isXmlHttpRequest()) {
+        // Réponse JSON pour l'API en cas de succès
+        return $this->json(
+            $user,
+            Response::HTTP_CREATED,
+            [
+                'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
+            ],
+            ['groups' => ['get_login']]
+        );
+    } else {
+        // Redirection vers la liste des utilisateurs pour l'interface Web
+        return $this->redirectToRoute('app_api_user', [], Response::HTTP_SEE_OTHER);
+    }
+}
 
 
       /**
