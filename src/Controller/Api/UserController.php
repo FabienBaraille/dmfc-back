@@ -185,8 +185,5 @@ class UserController extends AbstractController
             [],
             ['groups' => ['get_login']]
         );
-
     }
-
-    
 }
