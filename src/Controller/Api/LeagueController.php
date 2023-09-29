@@ -62,7 +62,7 @@ class LeagueController extends AbstractController
     /**
      * Create League
      * 
-     * @Route("/api/leagues", name="app_api_league_post", methods={"POST"})
+     * @Route("/api/leagues/new", name="app_api_league_post", methods={"POST"})
      */
     public function postLeague(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {

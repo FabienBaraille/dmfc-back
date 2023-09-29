@@ -53,7 +53,7 @@ class UserController extends AbstractController
   /**
    * Create User
    *
-   * @Route("/api/user", name="app_api_user_post", methods={"POST"})
+   * @Route("/api/user/new", name="app_api_user_post", methods={"POST"})
    */
   public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
 {
@@ -61,12 +61,27 @@ class UserController extends AbstractController
     $userData = json_decode($jsonContent, true);
 
     if (!isset($userData['league'])) {
-        return $this->json(['error' => 'Le champ "league" est requis.'], Response::HTTP_BAD_REQUEST);
+        return $this->json(['error' => 'Le champ "ligue" est requis.'], Response::HTTP_BAD_REQUEST);
     }
 
     $leagueId = $userData['league'];
 
     $league = $entityManager->getRepository(League::class)->find($leagueId);
+
+    if (!$league) {
+        return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
+    }
+
+    // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
+    $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
+    if ($existingUser) {
+        return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
+    }
+
+    $existingEmail = $userRepository->findOneBy(['email' => $userData['email']]);
+    if ($existingEmail) {
+        return $this->json(['error' => 'Email déjà utilisé.'], Response::HTTP_CONFLICT);
+    }
 
     $user = $serializer->deserialize($jsonContent, User::class, 'json');
     $user->setLeague($league);
@@ -84,21 +99,13 @@ class UserController extends AbstractController
 
         foreach ($errors as $error) {
             $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-        }
-
-        if ($request->isXmlHttpRequest()) {
-            
+        }            
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
-        } else {
-            
-        }
     }
 
     $entityManager->persist($user);
     $entityManager->flush();
 
-    if ($request->isXmlHttpRequest()) {
-        // Réponse JSON pour l'API en cas de succès
         return $this->json(
             $user,
             Response::HTTP_CREATED,
@@ -107,10 +114,6 @@ class UserController extends AbstractController
             ],
             ['groups' => ['get_login']]
         );
-    } else {
-        // Redirection vers la liste des utilisateurs pour l'interface Web
-        return $this->redirectToRoute('app_api_user', [], Response::HTTP_SEE_OTHER);
-    }
 }
 
 
@@ -138,12 +141,19 @@ class UserController extends AbstractController
     * 
     * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
     */
-    public function updateUser(Request $request, User $user, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    public function updateUser(UserRepository $userRepository, Request $request, User $user, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $jsonContent = $request->getContent();
-
+        $userData = json_decode($jsonContent, true);
+        
         $updatedUser = $serializer->deserialize($jsonContent, User::class, 'json');
 
+    // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
+    $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
+    if ($existingUser) {
+        return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
+    }
+        
         $errors = $validator->validate($updatedUser);
 
         if (count($errors) > 0) {
