@@ -24,7 +24,7 @@ class League
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"user_get_collection", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "leagues_get_collection", "news_get_collection"})
      */
     private $leagueName;
 
@@ -46,7 +46,6 @@ class League
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="league")
-     * @Groups({"leagues_get_users"})
      */
     private $users;
 

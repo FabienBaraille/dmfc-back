@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\NewsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\NewsRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=NewsRepository::class)
@@ -14,11 +15,13 @@ class News
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"news_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"news_get_collection"})
      */
     private $title;
 
@@ -29,6 +32,7 @@ class News
 
     /**
      * @ORM\ManyToOne(targetEntity=League::class, inversedBy="news")
+     * @Groups({"news_get_collection"})
      */
     private $league;
 
