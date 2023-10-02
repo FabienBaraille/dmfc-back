@@ -60,18 +60,6 @@ class UserController extends AbstractController
     $jsonContent = $request->getContent();
     $userData = json_decode($jsonContent, true);
 
-    if (!isset($userData['league'])) {
-        return $this->json(['error' => 'Le champ "ligue" est requis.'], Response::HTTP_BAD_REQUEST);
-    }
-
-    $leagueId = $userData['league'];
-
-    $league = $entityManager->getRepository(League::class)->find($leagueId);
-
-    if (!$league) {
-        return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
-    }
-
     // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
     $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
     if ($existingUser) {
@@ -84,7 +72,16 @@ class UserController extends AbstractController
     }
 
     $user = $serializer->deserialize($jsonContent, User::class, 'json');
-    $user->setLeague($league);
+
+    // Vérifiez si le champ "league" existe et si oui, associez l'utilisateur à une ligue
+    if (isset($userData['league'])) {
+        $leagueId = $userData['league'];
+        $league = $entityManager->getRepository(League::class)->find($leagueId);
+        if (!$league) {
+            return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
+        }
+        $user->setLeague($league);
+    }    
 
     // Hasher le mot de passe avant la sauvegarde
     $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
@@ -112,7 +109,7 @@ class UserController extends AbstractController
             [
                 'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
             ],
-            ['groups' => ['get_login']]
+            ['groups' => ['user_get_item']]
         );
 }
 
@@ -186,6 +183,11 @@ class UserController extends AbstractController
             $user->setTeam($newTeam);
         }
 
+        $newLeague = $updatedUser->getLeague();
+        if ($newLeague !== null) {
+            $user->setLeague($newLeague);
+        }
+
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -193,7 +195,7 @@ class UserController extends AbstractController
             $user,
             Response::HTTP_OK,
             [],
-            ['groups' => ['get_login']]
+            ['groups' => ['user_get_item']]
         );
     }
 }
