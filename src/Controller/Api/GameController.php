@@ -41,12 +41,12 @@ class GameController extends AbstractController
             $gameRepository->find($id),
             200,
             [],
-            ['groups' => 'games_get_user']
+            ['groups' => 'games_get_collection']
         );
     }
 
     /**
-     * GET games by user
+     * GET games by round
      * 
      * @Route("/api/games/round/{id}", name="app_api_game_by_round", methods={"GET"})
      */
@@ -117,6 +117,74 @@ class GameController extends AbstractController
         return $this->json(
             null,
             Response::HTTP_NO_CONTENT,
+        );
+    }
+
+    /**
+    * Update Game
+    * 
+    * @Route("/api/games/{id}", name="app_api_game_update", methods={"PUT"})
+    */
+    public function updateGame(Request $request, Game $game, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $jsonContent = $request->getContent();
+
+
+        $updatedLeague = $serializer->deserialize($jsonContent, Game::class, 'json');
+
+        $errors = $validator->validate($updatedLeague);
+
+        $game->setUpdatedAt(new \DateTime('now'));
+        
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // Vérifiez si les champs sont définis avant de les mettre à jour
+        $dateAndTimeOfMatch = $updatedLeague->setDateAndTimeOfMatch();
+        if ($dateAndTimeOfMatch !== null) {
+            $game->setDateAndTimeOfMatch($dateAndTimeOfMatch);
+        }
+
+        $visitorScore = $updatedLeague->getVisitorScore();
+        if ($visitorScore !== null) {
+            $game->setVisitorScore($visitorScore);
+        }
+
+        $homeScore = $updatedLeague->getHomeScore();
+        if ($homeScore !== null) {
+            $game->setHomeScore($homeScore);
+        }
+
+        $winner = $updatedLeague->getWinner();
+        if ($winner !== null) {
+            $game->setWinner($winner);
+        }
+
+        $visitorOdd = $updatedLeague->getVisitorOdd();
+        if ($visitorOdd !== null) {
+            $game->setVisitorOdd($visitorOdd);
+        }
+
+        $homeOdd = $updatedLeague->getHomeOdd();
+        if ($homeOdd !== null) {
+            $game->setHomeOdd($homeOdd);
+        }
+
+        $entityManager->persist($game);
+        $entityManager->flush();
+
+        return $this->json(
+            $game,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['games_get_collection']]
         );
     }
 }
