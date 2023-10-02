@@ -16,10 +16,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Security;
+
+
 
 class UserController extends AbstractController
 {
+   
     /**
     * GET users collection
     *
@@ -34,21 +37,41 @@ class UserController extends AbstractController
             ['groups' => 'user_get_collection']
         );
     }
+    
+    
+
 
     /**
-    * GET users by item
-    *
-    * @Route("/api/user/{id}", name="app_api_user_by_id", methods={"GET"})
-    */
-    public function getUserById(UserRepository $userRepository, $id): JsonResponse
-    {
+ * Obtenir un utilisateur par nom d'utilisateur
+ *
+ * @Route("/api/users/{username}", name="app_api_user_by_username", methods={"GET"})
+ */
+public function getUserByUsername(UserRepository $userRepository, string $username): JsonResponse
+{
+    $user = $userRepository->findOneBy(['username' => $username]);
+
+    if ($user) {
         return $this->json(
-            $userRepository->find($id),
+            [
+                'username' => $user->getUsername(),
+                'roles' => $user->getRoles(),
+                'team' => $user->getTeam(),
+                'league_id' => $user->getLeague(),
+                'title' => $user->getTitle(),
+                'score' => $user->getScore()
+                // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
+            ],
             200,
             [],
             ['groups' => 'user_get_item']
         );
+    } else {
+        return $this->json(['message' => 'Utilisateur non trouvé'], 404);
     }
+}
+
+
+
 
   /**
    * Create User
