@@ -63,7 +63,7 @@ class GameController extends AbstractController
     /**
      * Create Game
      * 
-     * @Route("/api/games/new", name="app_api_game_post", methods={"POST"})
+     * @Route("/api/game/new", name="app_api_game_post", methods={"POST"})
      */
     public function postGame(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
@@ -101,7 +101,7 @@ class GameController extends AbstractController
     /**
      * Delete Game
      *
-     * @Route("/api/games/{id}", name="app_api_game_delete", methods={"DELETE"})
+     * @Route("/api/game/{id}", name="app_api_game_delete", methods={"DELETE"})
      */
     public function deleteGame(EntityManagerInterface $entityManager, $id): JsonResponse
     {
@@ -123,7 +123,7 @@ class GameController extends AbstractController
     /**
     * Update Game
     * 
-    * @Route("/api/games/{id}", name="app_api_game_update", methods={"PUT"})
+    * @Route("/api/game/{id}", name="app_api_game_update", methods={"PUT"})
     */
     public function updateGame(Request $request, Game $game, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
