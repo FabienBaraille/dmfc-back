@@ -24,13 +24,14 @@ class League
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Groups({"user_get_collection", "leagues_get_collection", "news_get_collection"})
      * @Groups({"user_get_collection","get_login_league", "leagues_get_collection", "get_login", "user_get_item"})
      */
     private $leagueName;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
+     * @Groups({"leagues_get_collection"})
      */
     private $leagueDescription;
 
@@ -46,7 +47,6 @@ class League
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="league")
-     * @Groups({"get_league"})
      */
     private $users;
 

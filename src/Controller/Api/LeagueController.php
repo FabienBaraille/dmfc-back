@@ -55,7 +55,7 @@ class LeagueController extends AbstractController
             $leagueRepository->find($id)->getUsers(),
             200,
             [],
-            ['groups' => 'leagues_get_collection']
+            ['groups' => 'leagues_get_users', 'leagues_get_collection']
         );
     }
 

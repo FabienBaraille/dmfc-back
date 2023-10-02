@@ -21,13 +21,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users"})
      */
     private $username;
 
@@ -43,19 +43,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"user_get_collection", "user_get_item","get_login_league", "get_login", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection"})
      */
     private $roles = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "leagues_get_collection"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item","get_login_league", "leagues_get_collection","user_get_collection"})
+     * @Groups({"user_get_item", "leagues_get_collection","user_get_collection"})
      */
     private $score;
 
@@ -99,7 +99,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_collection","user_get_item", "get_login"})
+     * @Groups({"user_get_collection","user_get_item"})
      */
     private $team;
 
