@@ -105,8 +105,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=League::class, cascade={"persist"},inversedBy="users")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"user_get_collection"})
+     * @ORM\JoinColumn(nullable=true)
+     * @Groups({"user_get_collection", "get_login", "user_get_item"})
      */
     private $league;
 
