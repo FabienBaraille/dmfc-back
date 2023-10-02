@@ -53,7 +53,7 @@ class UserController extends AbstractController
   /**
    * Create User
    *
-   * @Route("/api/user/new", name="app_api_user_post", methods={"POST"})
+   * @Route("/api/user/new", name="app_api_user_new_post", methods={"POST"})
    */
   public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
 {
