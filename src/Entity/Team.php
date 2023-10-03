@@ -3,10 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\TeamRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=TeamRepository::class)
  */
@@ -16,30 +16,31 @@ class Team
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection","user_get_item"})
+     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=3)
-     * @Groups({"user_get_collection","user_get_item", "leagues_get_collection"})
+     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
      */
     private $trigram;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user_get_collection","user_get_item", "leagues_get_collection"})
+     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups ({"teams_get_collection"})
      */
     private $conference;
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
-     * @Groups({"user_get_item", "leagues_get_collection"})
+     * @Groups ({"teams_get_collection"})
      */
     private $logo;
 
