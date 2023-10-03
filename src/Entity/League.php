@@ -24,8 +24,7 @@ class League
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"user_get_collection", "leagues_get_collection", "news_get_collection"})
-     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection", "get_login", "user_get_item"})
+     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection", "news_get_collection", "user_get_item"})
      */
     private $leagueName;
 

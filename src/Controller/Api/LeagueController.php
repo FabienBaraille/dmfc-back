@@ -57,12 +57,12 @@ class LeagueController extends AbstractController
             return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
         }
 
-        $users = $league->getUsers();
-
         if (empty($users)) {
             return $this->json(['message' => "Aucun utilisateur trouvé dans cette ligue"], Response::HTTP_OK);
         }
 
+        $users = $league->getUsers();
+        
         return $this->json(
             $users,
             Response::HTTP_OK,
@@ -70,6 +70,32 @@ class LeagueController extends AbstractController
             ['groups' => ['leagues_get_users', 'leagues_get_collection']]
         );
     }
+
+    /**
+     * @Route("/api/leagues/{id}/news", name="app_league_id_news", methods={"GET"})
+     */
+    public function getNewsByLeague(LeagueRepository $leagueRepository, $id): JsonResponse
+    {
+        $league = $leagueRepository->find($id);
+
+        if (!$league) {
+            return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
+        }
+
+        if (empty($news)) {
+            return $this->json(['message' => "Aucune news trouvé dans cette ligue"], Response::HTTP_OK);
+        }
+
+        $news = $league->getNews();
+
+        return $this->json(
+            $news,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['news_get_collection']]
+        );
+    }
+
 
     /**
      * Create League
