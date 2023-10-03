@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class LeagueController extends AbstractController
+class LeagueController extends AbstractController 
 {
     /**
      * GET leagues collection
