@@ -47,6 +47,8 @@ class LeagueController extends AbstractController
     }
 
     /**
+     * GET users by league
+     * 
      * @Route("/api/leagues/{id}/users", name="app_league_id_users", methods={"GET"})
      */
     public function getUsersByLeague(LeagueRepository $leagueRepository, $id): JsonResponse
