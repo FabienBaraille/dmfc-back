@@ -2,8 +2,6 @@
 
 namespace App\Controller\Api;
 
-use id;
-use DateTime;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\League;
