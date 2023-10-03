@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class LeagueController extends AbstractController
+class LeagueController extends AbstractController 
 {
     /**
      * GET leagues collection
@@ -33,7 +33,7 @@ class LeagueController extends AbstractController
     /**
     * GET league by item
     *
-    * @Route("/api/leagues/{id}", name="app_api_league_id", methods={"GET"})
+    * @Route("/api/league/{id}", name="app_api_league_id", methods={"GET"})
     */
     public function getLeagueById(LeagueRepository $leagueRepository, $id): JsonResponse
     {
@@ -47,7 +47,9 @@ class LeagueController extends AbstractController
     }
 
     /**
-     * @Route("/api/leagues/{id}/users", name="app_league_id_users", methods={"GET"})
+     * GET User By League
+     * 
+     * @Route("/api/league/{id}/users", name="app_league_id_users", methods={"GET"})
      */
     public function getUsersByLeague(LeagueRepository $leagueRepository, $id): JsonResponse
     {
@@ -62,7 +64,7 @@ class LeagueController extends AbstractController
         if (empty($users)) {
             return $this->json(['message' => "Aucun utilisateur trouvé dans cette ligue"], Response::HTTP_OK);
         }
-
+        
         return $this->json(
             $users,
             Response::HTTP_OK,
@@ -72,9 +74,35 @@ class LeagueController extends AbstractController
     }
 
     /**
+     * @Route("/api/league/{id}/news", name="app_league_id_news", methods={"GET"})
+     */
+    public function getNewsByLeague(LeagueRepository $leagueRepository, $id): JsonResponse
+    {
+        $league = $leagueRepository->find($id);
+
+        if (!$league) {
+            return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
+        }
+
+        $news = $league->getNews();
+
+        if (empty($news)) {
+            return $this->json(['message' => "Aucune news trouvé dans cette ligue"], Response::HTTP_OK);
+        }
+
+        return $this->json(
+            $news,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['news_get_collection']]
+        );
+    }
+
+
+    /**
      * Create League
      * 
-     * @Route("/api/leagues/new", name="app_api_league_post", methods={"POST"})
+     * @Route("/api/league/new", name="app_api_league_post", methods={"POST"})
      */
     public function postLeague(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
@@ -112,7 +140,7 @@ class LeagueController extends AbstractController
     /**
      * Delete League
      *
-     * @Route("/api/leagues/{id}", name="app_api_league_delete", methods={"DELETE"})
+     * @Route("/api/league/{id}", name="app_api_league_delete", methods={"DELETE"})
      */
     public function deleteLeague(EntityManagerInterface $entityManager, $id): JsonResponse
     {
@@ -139,7 +167,6 @@ class LeagueController extends AbstractController
     public function updateLeague(Request $request, League $league, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $jsonContent = $request->getContent();
-
 
         $updatedLeague = $serializer->deserialize($jsonContent, League::class, 'json');
 
