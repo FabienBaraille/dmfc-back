@@ -19,11 +19,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Security;
 
-
-
 class UserController extends AbstractController
 {
-   
     /**
     * GET users collection
     *
@@ -39,104 +36,97 @@ class UserController extends AbstractController
         );
     }
     
-    
+    /**
+     * Obtenir un utilisateur par nom d'utilisateur
+     *
+     * @Route("/api/user/{username}", name="app_api_user_by_username", methods={"GET"})
+     */
+    public function getUserByUsername(UserRepository $userRepository, string $username): JsonResponse
+    {
+        $user = $userRepository->findOneBy(['username' => $username]);
 
+        if ($user) {
+            return $this->json(
+                [
+                    'username' => $user->getUsername(),
+                    'roles' => $user->getRoles(),
+                    'team' => $user->getTeam(),
+                    'league_id' => $user->getLeague(),
+                    'title' => $user->getTitle(),
+                    'score' => $user->getScore()
+                    // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
+                ],
+                200,
+                [],
+                ['groups' => 'user_get_item']
+            );
+        } else {
+            return $this->json(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+        }
+    }
 
     /**
- * Obtenir un utilisateur par nom d'utilisateur
- *
- * @Route("/api/users/{username}", name="app_api_user_by_username", methods={"GET"})
- */
-public function getUserByUsername(UserRepository $userRepository, string $username): JsonResponse
-{
-    $user = $userRepository->findOneBy(['username' => $username]);
+     * Create User
+     *
+     * @Route("/api/user/new", name="app_api_user_new_post", methods={"POST"})
+     */
+    public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $jsonContent = $request->getContent();
+        $userData = json_decode($jsonContent, true);
 
-    if ($user) {
-        return $this->json(
-            [
-                'username' => $user->getUsername(),
-                'roles' => $user->getRoles(),
-                'team' => $user->getTeam(),
-                'league_id' => $user->getLeague(),
-                'title' => $user->getTitle(),
-                'score' => $user->getScore()
-                // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
-            ],
-            200,
-            [],
-            ['groups' => 'user_get_item']
-        );
-    } else {
-        return $this->json(['message' => 'Utilisateur non trouvé'], 404);
-    }
-}
-
-
-
-
-  /**
-   * Create User
-   *
-   * @Route("/api/user/new", name="app_api_user_new_post", methods={"POST"})
-   */
-  public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
-{
-    $jsonContent = $request->getContent();
-    $userData = json_decode($jsonContent, true);
-
-    // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
-    $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
-    if ($existingUser) {
-        return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
-    }
-
-    $existingEmail = $userRepository->findOneBy(['email' => $userData['email']]);
-    if ($existingEmail) {
-        return $this->json(['error' => 'Email déjà utilisé.'], Response::HTTP_CONFLICT);
-    }
-
-    $user = $serializer->deserialize($jsonContent, User::class, 'json');
-
-    // Vérifiez si le champ "league" existe et si oui, associez l'utilisateur à une ligue
-    if (isset($userData['league'])) {
-        $leagueId = $userData['league'];
-        $league = $entityManager->getRepository(League::class)->find($leagueId);
-        if (!$league) {
-            return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
+        // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
+        $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
+        if ($existingUser) {
+            return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
         }
-        $user->setLeague($league);
-    }    
 
-    // Hasher le mot de passe avant la sauvegarde
-    $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
-    $user->setPassword($hashedPassword);
+        $existingEmail = $userRepository->findOneBy(['email' => $userData['email']]);
+        if ($existingEmail) {
+            return $this->json(['error' => 'Email déjà utilisé.'], Response::HTTP_CONFLICT);
+        }
 
-    $errors = $validator->validate($user);
+        $user = $serializer->deserialize($jsonContent, User::class, 'json');
 
-    $user->setCreatedAt(new \DateTime('now'));
+        // Vérifiez si le champ "league" existe et si oui, associez l'utilisateur à une ligue
+        if (isset($userData['league'])) {
+            $leagueId = $userData['league'];
+            $league = $entityManager->getRepository(League::class)->find($leagueId);
+            if (!$league) {
+                return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
+            }
+            $user->setLeague($league);
+        }    
 
-    if (count($errors) > 0) {
-        $errorMessages = [];
+        // Hasher le mot de passe avant la sauvegarde
+        $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+        $user->setPassword($hashedPassword);
 
-        foreach ($errors as $error) {
-            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-        }            
-            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        $user->setCreatedAt(new \DateTime('now'));
+
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }            
+                return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+            return $this->json(
+                $user,
+                Response::HTTP_CREATED,
+                [
+                    'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
+                ],
+                ['groups' => ['user_get_item']]
+            );
     }
-
-    $entityManager->persist($user);
-    $entityManager->flush();
-
-        return $this->json(
-            $user,
-            Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-            ],
-            ['groups' => ['user_get_item']]
-        );
-}
-
 
       /**
       * Delete User
@@ -148,111 +138,100 @@ public function getUserByUsername(UserRepository $userRepository, string $userna
           $user = $entityManager->getRepository(User::class)->find($id);
 
           if (!$user) {
-              return $this->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+              return $this->json(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
           }
 
           $entityManager->remove($user);
           $entityManager->flush();
 
-          return $this->json(null, Response::HTTP_NO_CONTENT);
+          return $this->json(['message' => 'Utilisateur supprimé avec succès'], Response::HTTP_OK);
       }
 
-        /**
-         * Update User
-         *
-         * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
-         */
-        public function updateUser(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, $id, UserPasswordHasherInterface $passwordHasher): JsonResponse
-        {
-            // Récupérez l'utilisateur existant depuis la base de données
-            $user = $entityManager->getRepository(User::class)->find($id);
+    /**
+     * Update User
+     *
+     * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
+     */
+    public function updateUser(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, $id, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        // Récupérez l'utilisateur existant depuis la base de données
+        $user = $entityManager->getRepository(User::class)->find($id);
 
-            if (!$user) {
-                return $this->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
-            }
-
-            // Désérialisez les données JSON de la requête en un objet User
-            $jsonContent = $request->getContent();
-            $userData = json_decode($jsonContent, true);
-
-            // Mise à jour des champs de l'utilisateur
-            if (isset($userData['username'])) {
-                $user->setUsername($userData['username']);
-            }
-
-            if (isset($userData['password'])) {
-                // Vous pouvez choisir de mettre à jour le mot de passe uniquement s'il est fourni dans les données
-                $hashedPassword = $passwordHasher->hashPassword($user, $userData['password']);
-                $user->setPassword($hashedPassword);
-            }
-
-            if (isset($userData['email'])) {
-                $user->setEmail($userData['email']);
-            }
-
-    // Mise à jour des champs de l'utilisateur
-    if (isset($userData['username'])) {
-        $user->setUsername($userData['username']);
-    }
-
-    if (isset($userData['password'])) {
-        // Vous pouvez choisir de mettre à jour le mot de passe uniquement s'il est fourni dans les données
-        $hashedPassword = $passwordHasher->hashPassword($user, $userData['password']);
-        $user->setPassword($hashedPassword);
-    }
-
-    if (isset($userData['email'])) {
-        $user->setEmail($userData['email']);
-    }
-
-    // Mise à jour de la relation "team"
-    if (isset($userData['team'])) {
-        // Récupérez l'ID de la nouvelle équipe
-        $newTeamId = $userData['team'];
-
-        // Récupérez l'équipe depuis la base de données
-        $newTeam = $entityManager->getRepository(Team::class)->find($newTeamId);
-
-        if (!$newTeam) {
-            return $this->json(['error' => 'New team not found.'], Response::HTTP_NOT_FOUND);
+        if (!$user) {
+            return $this->json(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
         }
 
-        // Associez l'utilisateur à la nouvelle équipe
-        $user->setTeam($newTeam);
-    }
+        // Désérialisez les données JSON de la requête en un objet User
+        $jsonContent = $request->getContent();
+        $userData = json_decode($jsonContent, true);
 
-    // Mise à jour de la relation "league"
-    if (isset($userData['league'])) {
-        // Récupérez l'ID de la nouvelle ligue
-        $newLeagueId = $userData['league'];
-
-        // Récupérez la ligue depuis la base de données
-        $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
-
-        if (!$newLeague) {
-            return $this->json(['error' => 'New league not found.'], Response::HTTP_NOT_FOUND);
+        // Mise à jour des champs de l'utilisateur
+        if (isset($userData['username'])) {
+            $user->setUsername($userData['username']);
         }
 
-        // Associez l'utilisateur à la nouvelle ligue
-        $user->setLeague($newLeague);
-    }            
-            // Validez les modifications apportées à l'utilisateur
-            $errors = $validator->validate($user);
+        if (isset($userData['password'])) {
+            // Mettre à jour le mot de passe uniquement s'il est fourni dans les données
+            $hashedPassword = $passwordHasher->hashPassword($user, $userData['password']);
+            $user->setPassword($hashedPassword);
+        }
 
-            if (count($errors) > 0) {
-                $errorMessages = [];
+        if (isset($userData['email'])) {
+            $user->setEmail($userData['email']);
+        }
 
-                foreach ($errors as $error) {
-                    $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-                }
 
-                return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        // Mise à jour de la relation "team"
+        if (isset($userData['team'])) {
+            // Récupérez l'ID de la nouvelle équipe
+            $newTeamId = $userData['team'];
+
+            // Récupérez l'équipe depuis la base de données
+            $newTeam = $entityManager->getRepository(Team::class)->find($newTeamId);
+
+            if (!$newTeam) {
+                return $this->json(['error' => 'Equipe inexistante'], Response::HTTP_NOT_FOUND);
             }
 
-            // Persistez les modifications en base de données
-            $entityManager->flush();
-
-            // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
-            return $this->json($user, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
+            // Associez l'utilisateur à la nouvelle équipe
+            $user->setTeam($newTeam);
         }
+
+        // Mise à jour de la relation "league"
+        if (isset($userData['league'])) {
+            // Récupérez l'ID de la nouvelle ligue
+            $newLeagueId = $userData['league'];
+
+            // Récupérez la ligue depuis la base de données
+            $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
+
+            if (!$newLeague) {
+                return $this->json(['error' => 'New league not found.'], Response::HTTP_NOT_FOUND);
+            }
+
+            // Associez l'utilisateur à la nouvelle ligue
+            $user->setLeague($newLeague);
+        }     
+
+        // Validez les modifications apportées à l'utilisateur
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $user->setUpdatedAt(new \Datetime);
+
+        // Persistez les modifications en base de données
+        $entityManager->flush();
+
+        // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
+    }
 }
