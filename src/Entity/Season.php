@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SeasonRepository;
+use App\Entity\Round;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +18,7 @@ class Season
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"rounds_get_collection"})
      */
     private $id;
 
@@ -41,6 +44,7 @@ class Season
 
     /**
      * @ORM\OneToMany(targetEntity=Round::class, mappedBy="season", orphanRemoval=true)
+     * 
      */
     private $rounds;
 
