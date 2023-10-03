@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $title;
 
-    /**
+    /**user_get_collection","user_get_item",
      * @ORM\Column(type="smallint", nullable=true)
      * @Groups({"user_get_item","get_login_league", "leagues_get_collection","user_get_collection"})
      */
@@ -98,7 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $srpredictions;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
+     * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users",cascade={"persist"})
      * @Groups({"user_get_collection","user_get_item", "get_login"})
      */
     private $team;

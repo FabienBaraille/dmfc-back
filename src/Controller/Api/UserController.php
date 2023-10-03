@@ -162,56 +162,55 @@ public function getUserByUsername(UserRepository $userRepository, string $userna
     /**
     * Update User
     * 
-    * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
+    * @Route("/api/users/{id}", name="app_api_user_update", methods={"PUT"})
     */
     public function updateUser(UserRepository $userRepository, Request $request, User $user, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $jsonContent = $request->getContent();
         $userData = json_decode($jsonContent, true);
-        
+    
+        // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
+        $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
+        if ($existingUser && $existingUser !== $user) {
+            return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
+        }
+    
+        // Désérialisez les données JSON en un objet User
         $updatedUser = $serializer->deserialize($jsonContent, User::class, 'json');
-
-    // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
-    $existingUser = $userRepository->findOneBy(['username' => $userData['username']]);
-    if ($existingUser) {
-        return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
-    }
-        
-        $errors = $validator->validate($updatedUser);
-
+    
+        // Assurez-vous que la clé 'league' existe dans les données JSON
+        if (isset($userData['league']) && is_array($userData['league'])) {
+            // Récupérez l'ID de la nouvelle ligue depuis les données JSON
+            $newLeagueId = $userData['league']['id'];
+    
+            // Récupérez l'entité League correspondante depuis la base de données
+            $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
+    
+            // Assurez-vous que la ligue existe
+            if (!$newLeague) {
+                return $this->json(['error' => 'Ligue introuvable.'], Response::HTTP_NOT_FOUND);
+            }
+    
+            // Mettez à jour la propriété 'league' de l'utilisateur avec la nouvelle ligue
+            $user->setLeague($newLeague);
+        }
+    
+        // Validez les données de l'utilisateur
+        $errors = $validator->validate($user);
+    
         if (count($errors) > 0) {
             $errorMessages = [];
-
+    
             foreach ($errors as $error) {
                 $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
             }
-
+    
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
-        $newUsername = $updatedUser->getUsername();
-        if ($newUsername !== null) {
-            $user->setUserName($newUsername);
-        }
-
-        $newPassword = $updatedUser->getPassword();
-        if ($newPassword !== null) {
-            $user->setPassword($newPassword);
-        }
-
-        $newEmail = $updatedUser->getEmail();
-        if ($newEmail !== null) {
-            $user->setEmail($newEmail);
-        }
-
-        $newTeam = $updatedUser->getTeam();
-        if ($newTeam !== null) {
-            $user->setTeam($newTeam);
-        }
-
-        $entityManager->persist($user);
+    
+        // Persistez les modifications en base de données
         $entityManager->flush();
-
+    
         return $this->json(
             $user,
             Response::HTTP_OK,
