@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\SeasonRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\SeasonRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 /**
  * @ORM\Entity(repositoryClass=SeasonRepository::class)
@@ -16,11 +18,13 @@ class Season
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"Seasons_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Groups({"Seasons_get_collection"})
      */
     private $year;
 
@@ -41,6 +45,7 @@ class Season
 
     /**
      * @ORM\OneToMany(targetEntity=Round::class, mappedBy="season", orphanRemoval=true)
+     * @Groups({"Seasons_get_collection"})
      */
     private $rounds;
 

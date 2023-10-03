@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class LeagueController extends AbstractController
+class LeagueController extends AbstractController 
 {
     /**
      * GET leagues collection
@@ -167,7 +167,6 @@ class LeagueController extends AbstractController
     public function updateLeague(Request $request, League $league, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $jsonContent = $request->getContent();
-
 
         $updatedLeague = $serializer->deserialize($jsonContent, League::class, 'json');
 
