@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\SrpredictionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=SrpredictionRepository::class)
@@ -14,41 +15,49 @@ class Srprediction
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *  @Groups({"prediction"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Groups({"prediction"})
      */
     private $predictedWinnigTeam;
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups({"prediction"})
      */
     private $predictedPointDifference;
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Groups({"prediction"})
      */
     private $validationStatus;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"prediction"})
      */
     private $pointScored;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"prediction"})
      */
     private $bonusPointsErned;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"prediction"})
      */
     private $bonusBookie;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"prediction"})
      */
     private $createdAt;
 
@@ -60,12 +69,14 @@ class Srprediction
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="srpredictions")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"prediction"})
      */
     private $User;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Game::class, inversedBy="srpredictions")
+     * @ORM\ManyToOne(targetEntity=Game::class, inversedBy="srpredictions", cascade={"persist"}))
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"prediction"})
      */
     private $Game;
 

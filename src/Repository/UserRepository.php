@@ -41,6 +41,21 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
+
+    /**
+     * Trouver les utilisateurs triés par username
+     *
+     * @return User[] Returns an array of User objects sorted by username
+     */
+    public function findUserByUsername(string $username)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.username = :username')
+            ->setParameter('username', $username)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
