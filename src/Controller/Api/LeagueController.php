@@ -37,12 +37,13 @@ class LeagueController extends AbstractController
     */
     public function getLeagueById(LeagueRepository $leagueRepository, $id): JsonResponse
     {
-        return $this->json(
-            $leagueRepository->find($id),
-            200,
-            [],
-            ['groups' => 'leagues_get_collection']
-        );
+        $league = $leagueRepository->find($id);
+
+        if (!$league) {
+            return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
+        }
+    
+        return $this->json($league, 200, [], ['groups' => 'leagues_get_collection']);
     }
 
     /**
@@ -50,12 +51,23 @@ class LeagueController extends AbstractController
      */
     public function getUsersByLeague(LeagueRepository $leagueRepository, $id): JsonResponse
     {
-        
+        $league = $leagueRepository->find($id);
+
+        if (!$league) {
+            return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
+        }
+
+        $users = $league->getUsers();
+
+        if (empty($users)) {
+            return $this->json(['message' => "Aucun utilisateur trouvé dans cette ligue"], Response::HTTP_OK);
+        }
+
         return $this->json(
-            $leagueRepository->find($id)->getUsers(),
-            200,
+            $users,
+            Response::HTTP_OK,
             [],
-            ['groups' => 'leagues_get_users', 'leagues_get_collection']
+            ['groups' => ['leagues_get_users', 'leagues_get_collection']]
         );
     }
 
