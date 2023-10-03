@@ -18,7 +18,7 @@ class League
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection","get_login_league","leagues_get_collection", "user_get_item"})
+     * @Groups({"user_get_collection","get_login_league","leagues_get_collection", "user_get_item", "news_get_item"})
      */
     private $id;
 
@@ -64,7 +64,6 @@ class League
         $this->users = new ArrayCollection();
         $this->rounds = new ArrayCollection();
         $this->news = new ArrayCollection();
-        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int
