@@ -82,4 +82,25 @@ class TeamController extends AbstractController
         );
     }
 
+    /**
+     * Delete a team
+     *
+     * @Route("/api/team/{id}", name="app_api_team_delete", methods={"DELETE"})
+     */
+    public function delete(Team $team = null, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Vérifiez si l'équipe existe
+        if ($team === null) {
+            // Réponse avec un statut 200 et le message
+            return $this->json(['message' => 'L\'équipe demandée n\'existe pas.'], 200);
+        }
+
+        // Supprimez l'équipe
+        $entityManager->remove($team);
+        $entityManager->flush();
+
+        // Réponse de succès
+        return $this->json(['message' => 'L\'équipe a été supprimée avec succès.'], 200);
+    }
+
 }
