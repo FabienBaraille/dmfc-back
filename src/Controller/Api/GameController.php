@@ -107,17 +107,17 @@ class GameController extends AbstractController
     {
         $game = $entityManager->getRepository(Game::class)->find($id);
 
-        if (!$game) {
-            return $this->json(['message' => 'Game not found'], Response::HTTP_NOT_FOUND);
+        // Vérifiez si la game existe
+        if ($game === null) {
+            // Réponse avec un statut 200 et le message
+            return $this->json(['message' => 'La game demandée n\'existe pas.'], 200);
         }
 
         $entityManager->remove($game);
         $entityManager->flush();
 
-        return $this->json(
-            null,
-            Response::HTTP_NO_CONTENT,
-        );
+        // Réponse de succès
+        return $this->json(['message' => 'La game a été supprimée avec succès.'], 200);
     }
 
     /**
