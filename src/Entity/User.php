@@ -61,7 +61,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_collection"})
+     * @Groups({"user_get_collection", "leagues_get_collection"})
       */
     private $oldPosition;
 
@@ -99,7 +99,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_collection","user_get_item"})
+     * @Groups({"user_get_collection","user_get_item", "leagues_get_collection"})
      */
     private $team;
 
