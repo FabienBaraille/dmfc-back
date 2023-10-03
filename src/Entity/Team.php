@@ -7,7 +7,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
 /**
  * @ORM\Entity(repositoryClass=TeamRepository::class)
  */
@@ -17,18 +16,19 @@ class Team
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"user_get_collection","user_get_item"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=3)
-     * 
+     * @Groups({"user_get_collection","user_get_item"})
      */
     private $trigram;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"get_login"})
+     * @Groups({"user_get_collection","user_get_item"})
      */
     private $name;
 
