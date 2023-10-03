@@ -140,7 +140,6 @@ class LeagueController extends AbstractController
     {
         $jsonContent = $request->getContent();
 
-
         $updatedLeague = $serializer->deserialize($jsonContent, League::class, 'json');
 
         $errors = $validator->validate($updatedLeague);
