@@ -27,6 +27,7 @@ class News
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"news_get_item"})
      */
     private $description;
 
