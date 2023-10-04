@@ -55,10 +55,19 @@ class GameController extends AbstractController
      * 
      * @Route("/api/games/round/{id}", name="app_api_game_by_round", methods={"GET"})
      */
-    public function getGamesByRound(GameRepository $gameRepository, $id): JsonResponse
+    public function getGamesByRound(GameRepository $gameRepository, $id, EntityManagerInterface $entityManager): JsonResponse
     {
+        $round = $entityManager->getRepository(Round::class)->find($id);
+
+        if (!$round) {
+            return $this->json(['message' => 'Round non trouvé.'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Utilisez la méthode personnalisée de votre GameRepository pour récupérer toutes les parties d'un round
+        $games = $gameRepository->findByRound($round);
+
         return $this->json(
-            $gameRepository->find($id),
+            $games,
             200,
             [],
             ['groups' => 'games_get_round']

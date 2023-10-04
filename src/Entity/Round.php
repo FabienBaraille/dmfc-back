@@ -62,6 +62,7 @@ class Round
 
     /**
      * @ORM\OneToMany(targetEntity=Game::class, mappedBy="round", orphanRemoval=true)
+     * @Groups({"games_get_collection", "games_get_post"})
      */
     private $games;
 
