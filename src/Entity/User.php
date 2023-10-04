@@ -94,13 +94,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Srprediction::class, mappedBy="User", orphanRemoval=true)
-     * @Groups({ "user_get_item"})
+     * @Groups({"user_get_item"})
      */
     private $srpredictions;
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_collection","user_get_item"})
+     * @Groups({"user_get_collection","user_get_item", "leagues_get_users"})
      */
     private $team;
 
