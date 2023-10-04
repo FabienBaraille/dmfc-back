@@ -19,13 +19,13 @@ class Round
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"games_get_collection"})
+     * @Groups({"rounds_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"rounds_get_collection", "games_get_collection"})
+     * @Groups({"leagues_get_collection"})
     */
     private $name;
 
@@ -55,14 +55,12 @@ class Round
     /**
      * @ORM\ManyToOne(targetEntity=League::class, inversedBy="rounds")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"rounds_get_collection"})
      */
     private $league;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="rounds")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"rounds_get_collection"})
      */
     private $user;
 

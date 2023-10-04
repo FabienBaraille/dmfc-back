@@ -5,6 +5,7 @@ use App\Entity\User;
 use App\Entity\Round;
 use App\Entity\League;
 use App\Entity\Season;
+use App\Repository\RoundRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
@@ -193,4 +194,5 @@ public function deleteRound($id, EntityManagerInterface $entityManager): JsonRes
 
     return $this->json(['message' => 'Tour supprimé avec succès'], Response::HTTP_OK);
 }
+ 
 }
