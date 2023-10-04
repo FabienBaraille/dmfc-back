@@ -48,7 +48,7 @@ class Game
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"games_get_collection"})
+     * @Groups({"games_get_collection",})
      */
     private $visitorOdd;
 

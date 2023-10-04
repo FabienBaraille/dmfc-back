@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RoundController extends AbstractController
 {
-    /**
+   /**
      * @Route("/api/create/round", name="api_id_create_round", methods={"POST"})
      */
     public function createRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
@@ -119,10 +119,8 @@ class RoundController extends AbstractController
         ['groups' => ['rounds_get_collection']]
     );
 }
-
-
 /**
- * @Route("/api/update/round/{id}", name="api_id_update_round", methods={"PUT", "PATCH"})
+ * @Route("/api/update/round/{id}", name="api_id_update_round", methods={"PUT"})
  */
 public function updateRound(Request $request, $id, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
 {
