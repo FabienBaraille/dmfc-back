@@ -62,65 +62,66 @@ class GameController extends AbstractController
         );
     }
 
-    /**
-     * Create Game
-     * 
-     * @Route("/api/game/new", name="app_api_game_post", methods={"POST"})
-     */
-    public function postGame(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-    {
-        $jsonContent = $request->getContent();
-        $gameData = json_decode($jsonContent, true);
+/**
+ * Create Game
+ * 
+ * @Route("/api/game/new", name="app_api_game_post", methods={"POST"})
+ */
+public function postGame(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+{
+    $jsonContent = $request->getContent();
+    $gameData = json_decode($jsonContent, true);
 
-        $game = $serializer->deserialize($jsonContent, Game::class,'json');
+    $game = $serializer->deserialize($jsonContent, Game::class,'json');
 
-        // Vérifiez si le champ "round" existe et si oui, associez le match à un round
-        if (isset($gameData['round'])) {
-            $roundId = $gameData['round'];
-            $round = $entityManager->getRepository(Round::class)->find($roundId);
-            if (!$round) {
-                return $this->json(['error' => 'Round non trouvée.'], Response::HTTP_NOT_FOUND);
-            }
-            $game->setround($round);
-        }    
-        
-        // Vérifiez si le champ "team" existe et si oui, associez le match à deux team
-        if (isset($gameData['team'])) {
-            $teamId = $gameData['team'];
+    // Vérifiez si le champ "round" existe et si oui, associez le match à un round
+    if (isset($gameData['round'])) {
+        $roundId = $gameData['round'];
+        $round = $entityManager->getRepository(Round::class)->find($roundId);
+        if (!$round) {
+            return $this->json(['error' => 'Round non trouvé.'], Response::HTTP_NOT_FOUND);
+        }
+        $game->setRound($round);
+    }
+
+    // Vérifiez si le champ "teams" existe et si oui, associez le match à des équipes
+    if (isset($gameData['teams'])) {
+        $teamIds = $gameData['teams'];
+        foreach ($teamIds as $teamId) {
             $team = $entityManager->getRepository(Team::class)->find($teamId);
             if (!$team) {
-                return $this->json(['error' => 'team non trouvée.'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => 'Équipe non trouvée.'], Response::HTTP_NOT_FOUND);
             }
-            $game->setteam($team);
-        }            
-        
+            $game->addTeam($team);
+        }
+    }
 
-        $game->setCreatedAt(new \DateTime('now'));
+    $game->setCreatedAt(new \DateTime('now'));
 
-        $errors = $validator->validate($game);
+    $errors = $validator->validate($game);
 
-        if (count($errors) > 0) {
-            $errorMessages = [];
+    if (count($errors) > 0) {
+        $errorMessages = [];
 
-            foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-            }
-            
-            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        foreach ($errors as $error) {
+            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
         }
 
-        $entityManager->persist($game);
-        $entityManager->flush();
-
-        return $this->json(
-            $game,
-            Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_game', ['id' => $game->getId()]),
-            ],
-            ['groups' => ['games_get_post']]
-        );
+        return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
+
+    $entityManager->persist($game);
+    $entityManager->flush();
+
+    return $this->json(
+        $game,
+        Response::HTTP_CREATED,
+        [
+            'Location' => $this->generateUrl('app_api_game', ['id' => $game->getId()]),
+        ],
+        ['groups' => ['games_get_post']]
+    );
+}
 
     /**
      * Delete Game
