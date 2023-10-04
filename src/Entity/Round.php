@@ -17,13 +17,13 @@ class Round
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"games_get_collection"})
+     * @Groups({"games_get_collection", "games_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"games_get_collection"})
+     * @Groups({"games_get_collection", "games_get_post"})
      */
     private $name;
 
