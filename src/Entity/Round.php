@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-
 /**
  * @ORM\Entity(repositoryClass=RoundRepository::class)
  */
@@ -19,13 +18,13 @@ class Round
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"rounds_get_collection"})
+     * @Groups({"rounds_get_collection", "games_get_collection", "games_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"leagues_get_collection","rounds_get_collection"})
+     * @Groups({"leagues_get_collection","rounds_get_collection", "games_get_collection", "games_get_post"})
     */
     private $name;
 
