@@ -94,7 +94,7 @@ class LeagueController extends AbstractController
             $news,
             Response::HTTP_OK,
             [],
-            ['groups' => ['news_get_collection']]
+            ['groups' => ['news_get_collection', 'news_get_item']]
         );
     }
 
