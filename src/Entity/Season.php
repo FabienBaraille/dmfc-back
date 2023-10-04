@@ -4,9 +4,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\SeasonRepository;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\Round;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 
 /**
@@ -18,7 +19,7 @@ class Season
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"Seasons_get_collection"})
+     * @Groups({"rounds_get_collection","Seasons_get_collection"})
      */
     private $id;
 
