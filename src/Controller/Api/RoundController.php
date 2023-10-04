@@ -18,35 +18,35 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RoundController extends AbstractController
 {
-   /**
-     * @Route("/api/create/round", name="api_id_create_round", methods={"POST"})
-     */
-    public function createRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
-{
+  /**
+  * @Route("/api/round/new", name="api_id_create_round", methods={"POST"})
+  */
+  public function createRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+  {
     $jsonContent = $request->getContent();
     $roundData = json_decode($jsonContent, true);
 
     if ($roundData === null) {
-        return $this->json(['error' => 'Données JSON invalides'], Response::HTTP_BAD_REQUEST);
+      return $this->json(['error' => 'Données JSON invalides'], Response::HTTP_BAD_REQUEST);
     }
 
     // Vérifiez si "season" existe dans les données JSON
     if (!isset($roundData['season'])) {
-        return $this->json(['error' => 'La clé "season" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+      return $this->json(['error' => 'La clé "season" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
     }
 
     // Vérifiez si "year" existe dans les données JSON
     if (!isset($roundData['season']['year'])) {
-        return $this->json(['error' => 'La clé "year" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+      return $this->json(['error' => 'La clé "year" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
     }
 
     // Autres vérifications pour s'assurer que d'autres données requises existent
     if (!isset($roundData['user_id'])) {
-        return $this->json(['error' => 'La clé "user_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+      return $this->json(['error' => 'La clé "user_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
     }
 
     if (!isset($roundData['league_id'])) {
-        return $this->json(['error' => 'La clé "league_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+      return $this->json(['error' => 'La clé "league_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
     }
 
     // Désérialisez les données JSON dans une nouvelle entité Round
@@ -59,7 +59,7 @@ class RoundController extends AbstractController
     $season = $entityManager->getRepository(Season::class)->find($seasonId);
 
     if (!$season) {
-        return $this->json(['error' => 'Saison introuvable'], Response::HTTP_NOT_FOUND);
+      return $this->json(['error' => 'Saison introuvable'], Response::HTTP_NOT_FOUND);
     }
 
     // Récupérez l'année depuis les données JSON et associez-la à la saison (Season)
@@ -74,7 +74,7 @@ class RoundController extends AbstractController
     $league = $entityManager->getRepository(League::class)->find($leagueId);
 
     if (!$league) {
-        return $this->json(['error' => 'Ligue introuvable'], Response::HTTP_NOT_FOUND);
+      return $this->json(['error' => 'Ligue introuvable'], Response::HTTP_NOT_FOUND);
     }
 
     $round->setLeague($league);
@@ -84,7 +84,7 @@ class RoundController extends AbstractController
     $user = $entityManager->getRepository(User::class)->find($userId);
 
     if (!$user) {
-        return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_NOT_FOUND);
+      return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_NOT_FOUND);
     }
 
     $round->setUser($user);
@@ -97,13 +97,13 @@ class RoundController extends AbstractController
     $errors = $validator->validate($round);
 
     if (count($errors) > 0) {
-        $errorMessages = [];
+      $errorMessages = [];
 
-        foreach ($errors as $error) {
-            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-        }
-
-        return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+      foreach ($errors as $error) {
+        $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+      }
+      
+      return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     // Persistez et flush (enregistrez) le tour dans la base de données
@@ -111,24 +111,27 @@ class RoundController extends AbstractController
     $entityManager->flush();
 
     return $this->json(
-        $round,
-        Response::HTTP_CREATED,
-        [
-            'Location' => $this->generateUrl('api_id_create_round', ['id' => $round->getId()]),
-        ],
-        ['groups' => ['rounds_get_collection']]
+    $round,
+    Response::HTTP_CREATED,
+    [
+    'Location' => $this->generateUrl('api_id_create_round', ['id' => $round->getId()]),
+    ],
+    ['groups' => ['rounds_get_collection']]
     );
-}
-/**
- * @Route("/api/update/round/{id}", name="api_id_update_round", methods={"PUT"})
- */
-public function updateRound(Request $request, $id, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
-{
+  }
+
+  /**
+  * Updated Round
+  *
+  * @Route("/api/round/{id}", name="api_id_update_round", methods={"PUT"})
+  */
+  public function updateRound(Request $request, $id, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+  {
     // Récupérez l'entité Round existante en utilisant son identifiant ($id)
     $round = $entityManager->getRepository(Round::class)->find($id);
 
     if (!$round) {
-        return $this->json(['error' => 'Round introuvable'], Response::HTTP_NOT_FOUND);
+      return $this->json(['error' => 'Round introuvable'], Response::HTTP_NOT_FOUND);
     }
 
     // Parsez les données JSON de la requête
@@ -136,61 +139,59 @@ public function updateRound(Request $request, $id, SerializerInterface $serializ
     $roundData = json_decode($jsonContent, true);
 
     if ($roundData === null) {
-        return $this->json(['error' => 'Données JSON invalides'], Response::HTTP_BAD_REQUEST);
+      return $this->json(['error' => 'Données JSON invalides'], Response::HTTP_BAD_REQUEST);
     }
 
     // Vous pouvez mettre à jour les propriétés du tour existant avec les données JSON reçues
     // Par exemple, pour mettre à jour le nom et la catégorie :
     if (isset($roundData['name'])) {
-        $round->setName($roundData['name']);
+      $round->setName($roundData['name']);
     }
     if (isset($roundData['category'])) {
-        $round->setCategory($roundData['category']);
+      $round->setCategory($roundData['category']);
     }
-
-
+    
     // Validez l'entité Round mise à jour
     $errors = $validator->validate($round);
 
     if (count($errors) > 0) {
-        $errorMessages = [];
+      $errorMessages = [];
 
-        foreach ($errors as $error) {
-            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-        }
+    foreach ($errors as $error) {
+      $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+    }
 
-        return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+    return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     // Persistez les modifications dans la base de données
     $entityManager->flush();
 
     return $this->json(
-        $round,
-        Response::HTTP_OK,
-        [
-            'Location' => $this->generateUrl('api_id_update_round', ['id' => $round->getId()]),
-        ],
-        ['groups' => ['rounds_get_collection']]
+    $round,
+    Response::HTTP_OK,
+    [
+    'Location' => $this->generateUrl('api_id_update_round', ['id' => $round->getId()]),
+    ],
+    ['groups' => ['rounds_get_collection']]
     );
-}
-/**
- * @Route("/api/delete/round/{id}", name="api_id_delete_round", methods={"DELETE"})
- */
-public function deleteRound($id, EntityManagerInterface $entityManager): JsonResponse
-{
+  }
+  
+  /**
+  * @Route("/api/round/{id}", name="api_id_delete_round", methods={"DELETE"})
+  */
+  public function deleteRound($id, EntityManagerInterface $entityManager): JsonResponse
+  {
     // Récupérez l'entité Round à supprimer en utilisant son identifiant ($id)
     $round = $entityManager->getRepository(Round::class)->find($id);
 
     if (!$round) {
-        return $this->json(['error' => 'Tour introuvable'], Response::HTTP_NOT_FOUND);
+      return $this->json(['error' => 'Round introuvable'], Response::HTTP_NOT_FOUND);
     }
-
     // Supprimez l'entité Round de la base de données
     $entityManager->remove($round);
     $entityManager->flush();
 
-    return $this->json(['message' => 'Tour supprimé avec succès'], Response::HTTP_OK);
-}
- 
+    return $this->json(['message' => 'Round supprimé avec succès'], Response::HTTP_OK);
+  }
 }

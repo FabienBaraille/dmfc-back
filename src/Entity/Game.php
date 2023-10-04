@@ -17,25 +17,23 @@ class Game
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"games_get_collection","prediction","rounds_get_collection", "games_get_round"})
+     * @Groups({"games_get_collection","prediction","rounds_get_collection", "games_get_round", "games_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"games_get_collection", "games_get_post"})
+     * @Groups({"games_get_collection", "games_get_round", "games_get_post"})
      */
     private $dateAndTimeOfMatch;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"games_get_collection"})
      */
     private $visitorScore;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"games_get_collection"})
      */
     private $homeScore;
 
@@ -53,7 +51,6 @@ class Game
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"games_get_collection"})
      */
     private $homeOdd;
 

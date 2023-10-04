@@ -40,12 +40,14 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-         - { path: ^/admin, roles: ROLE_ADMIN }
-         - { path: ^/profile, roles: ROLE_USER }
          - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
+         - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/login, roles: PUBLIC_ACCESS }
-         - { path: ^/api/leagues, roles: PUBLIC_ACCESS }
-         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+         - { path: ^/api, roles: ROLE_ADMIN }
+
+    role_hierarchy:
+        ROLE_ADMIN:     ROLE_DMFC
+        ROLE_DMFC:      ROLE_JOUEUR
 
 when@test:
     security:
