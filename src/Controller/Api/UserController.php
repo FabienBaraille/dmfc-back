@@ -8,14 +8,15 @@ use App\Entity\League;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Security;
 
 class UserController extends AbstractController
 {
@@ -26,6 +27,10 @@ class UserController extends AbstractController
     */
     public function getUserAll(UserRepository $userRepository): JsonResponse
     {
+        // Vérifier si l'utilisateur a la permission d'accéder à cette page
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            throw new AccessDeniedException('Vous n\'avez pas la permission d\'accéder à cette page.');
+        }      
         return $this->json(
             $userRepository->findAll(),
             200,
