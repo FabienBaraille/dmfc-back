@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Entity\Srprediction;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\SrpredictionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,15 +28,26 @@ class SrpredictionController extends AbstractController
    /**
     * GET prediction by user
     *
-    * @Route("/api/srprediction/user/{id}", name="app_api_srprediction_user_by_id", methods={"GET"})
+    * @Route("/api/srprediction/{id}", name="app_api_srprediction_user_by_id", methods={"GET"})
     */
-    public function getSrpredictionByUserId(UserRepository $userRepository, $id): JsonResponse
+    public function getSrpredictionsByUserId(UserRepository $userRepository, SrpredictionRepository $predictionRepository, $id): JsonResponse
     {
+    // Recherchez l'utilisateur par ID
+    $user = $userRepository->find($id);
+
+    if (!$user) {
+        return $this->json(['error' => 'User not found'], 404);
+    }
+
+    // Récupérez toutes les prédictions associées à l'utilisateur
+    $predictions = $predictionRepository->findBy(['User' => $user]);
+
+    // Vous pouvez renvoyer les prédictions sous forme de réponse JSON
     return $this->json(
-        $userRepository->find($id),
+        $predictions,
         200,
         [],
-        ['groups' => ['user_get_item', 'prediction']]
+        ['groups' => 'prediction']
     );
 }
     /**

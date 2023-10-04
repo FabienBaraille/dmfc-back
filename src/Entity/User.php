@@ -94,6 +94,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Srprediction::class, mappedBy="User", orphanRemoval=true)
+     * @Groups({ "user_get_item"})
      */
     private $srpredictions;
 
