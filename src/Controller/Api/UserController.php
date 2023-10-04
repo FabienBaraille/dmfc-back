@@ -51,7 +51,8 @@ class UserController extends AbstractController
                     'team' => $user->getTeam(),
                     'league_id' => $user->getLeague(),
                     'title' => $user->getTitle(),
-                    'score' => $user->getScore()
+                    'score' => $user->getScore(),
+                    'email' => $user->getEmail()
                     // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
                 ],
                 200,
