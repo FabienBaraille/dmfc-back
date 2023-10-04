@@ -3,6 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Entity\Game;
+use App\Entity\Team;
+use App\Entity\Round;
 use App\Repository\GameRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +58,7 @@ class GameController extends AbstractController
             $gameRepository->find($id),
             200,
             [],
-            ['groups' => 'games_get_round']
+            ['groups' => 'games_get_collection', 'games_get_round']
         );
     }
 
@@ -68,8 +70,30 @@ class GameController extends AbstractController
     public function postGame(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
         $jsonContent = $request->getContent();
+        $gameData = json_decode($jsonContent, true);
 
         $game = $serializer->deserialize($jsonContent, Game::class,'json');
+
+        // Vérifiez si le champ "round" existe et si oui, associez le match à un round
+        if (isset($gameData['round'])) {
+            $roundId = $gameData['round'];
+            $round = $entityManager->getRepository(Round::class)->find($roundId);
+            if (!$round) {
+                return $this->json(['error' => 'Round non trouvée.'], Response::HTTP_NOT_FOUND);
+            }
+            $game->setround($round);
+        }    
+        
+        // Vérifiez si le champ "team" existe et si oui, associez le match à deux team
+        if (isset($gameData['team'])) {
+            $teamId = $gameData['team'];
+            $team = $entityManager->getRepository(Team::class)->find($teamId);
+            if (!$team) {
+                return $this->json(['error' => 'team non trouvée.'], Response::HTTP_NOT_FOUND);
+            }
+            $game->setteam($team);
+        }            
+        
 
         $game->setCreatedAt(new \DateTime('now'));
 
@@ -94,7 +118,7 @@ class GameController extends AbstractController
             [
                 'Location' => $this->generateUrl('app_api_game', ['id' => $game->getId()]),
             ],
-            ['groups' => ['games_get_collection']]
+            ['groups' => ['games_get_post']]
         );
     }
 
