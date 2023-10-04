@@ -6,6 +6,8 @@ use App\Entity\Game;
 use App\Entity\Team;
 use App\Entity\Round;
 use App\Repository\GameRepository;
+use App\Repository\TeamRepository;
+use App\Repository\RoundRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class GameController extends AbstractController
@@ -52,76 +55,86 @@ class GameController extends AbstractController
      * 
      * @Route("/api/games/round/{id}", name="app_api_game_by_round", methods={"GET"})
      */
-    public function getGamesByRound(GameRepository $gameRepository, $id): JsonResponse
+    public function getGamesByRound(GameRepository $gameRepository, $id, EntityManagerInterface $entityManager): JsonResponse
     {
+        $round = $entityManager->getRepository(Round::class)->find($id);
+
+        if (!$round) {
+            return $this->json(['message' => 'Round non trouvé.'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Utilisez la méthode personnalisée de votre GameRepository pour récupérer toutes les parties d'un round
+        $games = $gameRepository->findByRound($round);
+
         return $this->json(
-            $gameRepository->find($id),
+            $games,
             200,
             [],
             ['groups' => 'games_get_collection', 'games_get_round']
         );
     }
 
-/**
- * Create Game
- * 
- * @Route("/api/game/new", name="app_api_game_post", methods={"POST"})
- */
-public function postGame(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
-{
-    $jsonContent = $request->getContent();
-    $gameData = json_decode($jsonContent, true);
 
-    $game = $serializer->deserialize($jsonContent, Game::class,'json');
+    /**
+     * Create Game
+     * 
+     * @Route("/api/game/new", name="app_api_game_post", methods={"POST"})
+     */
+    public function postGame(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    {
+        $jsonContent = $request->getContent();
+        $gameData = json_decode($jsonContent, true);
 
-    // Vérifiez si le champ "round" existe et si oui, associez le match à un round
-    if (isset($gameData['round'])) {
-        $roundId = $gameData['round'];
-        $round = $entityManager->getRepository(Round::class)->find($roundId);
-        if (!$round) {
-            return $this->json(['error' => 'Round non trouvé.'], Response::HTTP_NOT_FOUND);
-        }
-        $game->setRound($round);
-    }
+        $game = $serializer->deserialize($jsonContent, Game::class,'json');
 
-    // Vérifiez si le champ "teams" existe et si oui, associez le match à des équipes
-    if (isset($gameData['teams'])) {
-        $teamIds = $gameData['teams'];
-        foreach ($teamIds as $teamId) {
-            $team = $entityManager->getRepository(Team::class)->find($teamId);
-            if (!$team) {
-                return $this->json(['error' => 'Équipe non trouvée.'], Response::HTTP_NOT_FOUND);
+        // Vérifiez si le champ "round" existe et si oui, associez le match à un round
+        if (isset($gameData['round'])) {
+            $roundId = $gameData['round'];
+            $round = $entityManager->getRepository(Round::class)->find($roundId);
+            if (!$round) {
+                return $this->json(['error' => 'Round non trouvé.'], Response::HTTP_NOT_FOUND);
             }
-            $game->addTeam($team);
-        }
-    }
-
-    $game->setCreatedAt(new \DateTime('now'));
-
-    $errors = $validator->validate($game);
-
-    if (count($errors) > 0) {
-        $errorMessages = [];
-
-        foreach ($errors as $error) {
-            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            $game->setRound($round);
         }
 
-        return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        // Vérifiez si le champ "teams" existe et si oui, associez le match à des équipes
+        if (isset($gameData['teams'])) {
+            $teamIds = $gameData['teams'];
+            foreach ($teamIds as $teamId) {
+                $team = $entityManager->getRepository(Team::class)->find($teamId);
+                if (!$team) {
+                    return $this->json(['error' => 'Équipe non trouvée.'], Response::HTTP_NOT_FOUND);
+                }
+                $game->addTeam($team);
+            }
+        }
+
+        $game->setCreatedAt(new \DateTime('now'));
+
+        $errors = $validator->validate($game);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $entityManager->persist($game);
+        $entityManager->flush();
+
+        return $this->json(
+            $game,
+            Response::HTTP_CREATED,
+            [
+                'Location' => $this->generateUrl('app_api_game', ['id' => $game->getId()]),
+            ],
+            ['groups' => ['games_get_post']]
+        );
     }
-
-    $entityManager->persist($game);
-    $entityManager->flush();
-
-    return $this->json(
-        $game,
-        Response::HTTP_CREATED,
-        [
-            'Location' => $this->generateUrl('app_api_game', ['id' => $game->getId()]),
-        ],
-        ['groups' => ['games_get_post']]
-    );
-}
 
     /**
      * Delete Game
@@ -145,22 +158,54 @@ public function postGame(Request $request, SerializerInterface $serializer, Enti
         return $this->json(['message' => 'La game a été supprimée avec succès.'], 200);
     }
 
-    /**
-    * Update Game
-    * 
-    * @Route("/api/game/{id}", name="app_api_game_update", methods={"PUT"})
-    */
-    public function updateGame(Request $request, Game $game, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+     /**
+     * Update Game
+     *
+     * @Route("/api/game/{id}", name="app_api_game_update", methods={"PUT"})
+     */
+    public function updateGame(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, $id): JsonResponse
     {
+        $game = $entityManager->getRepository(Game::class)->find($id);
+
+        // Vérifiez si le jeu existe
+        if ($game === null) {
+            // Réponse avec un statut 404 si le jeu n'est pas trouvé
+            return $this->json(['message' => 'Le jeu demandé n\'existe pas.'], Response::HTTP_NOT_FOUND);
+        }
+
         $jsonContent = $request->getContent();
+        $gameData = json_decode($jsonContent, true);
 
+        $serializer = $this->get('serializer');
+        $updatedGame = $serializer->deserialize($jsonContent, Game::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $game]);
 
-        $updatedLeague = $serializer->deserialize($jsonContent, Game::class, 'json');
+        // Vérifiez si le champ "round" existe et si oui, mettez à jour le jeu avec le nouveau round
+        if (isset($gameData['round'])) {
+            $roundId = $gameData['round'];
+            $round = $entityManager->getRepository(Round::class)->find($roundId);
+            if (!$round) {
+                return $this->json(['error' => 'Round non trouvé.'], Response::HTTP_NOT_FOUND);
+            }
+            $updatedGame->setRound($round);
+        }
 
-        $errors = $validator->validate($updatedLeague);
+        // Vérifiez si le champ "teams" existe et si oui, mettez à jour le jeu avec les nouvelles équipes
+        if (isset($gameData['teams'])) {
+            $teamIds = $gameData['teams'];
+            $updatedGame->clearTeams(); // Supprimer les équipes actuelles pour éviter les doublons
+            foreach ($teamIds as $teamId) {
+                $team = $entityManager->getRepository(Team::class)->find($teamId);
+                if (!$team) {
+                    return $this->json(['error' => 'Équipe non trouvée.'], Response::HTTP_NOT_FOUND);
+                }
+                $updatedGame->addTeam($team);
+            }
+        }
 
-        $game->setUpdatedAt(new \DateTime('now'));
-        
+        $updatedGame->setUpdatedAt(new \DateTime('now'));
+
+        $errors = $validator->validate($updatedGame);
+
         if (count($errors) > 0) {
             $errorMessages = [];
 
@@ -171,45 +216,13 @@ public function postGame(Request $request, SerializerInterface $serializer, Enti
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // Vérifiez si les champs sont définis avant de les mettre à jour
-        $dateAndTimeOfMatch = $updatedLeague->setDateAndTimeOfMatch();
-        if ($dateAndTimeOfMatch !== null) {
-            $game->setDateAndTimeOfMatch($dateAndTimeOfMatch);
-        }
-
-        $visitorScore = $updatedLeague->getVisitorScore();
-        if ($visitorScore !== null) {
-            $game->setVisitorScore($visitorScore);
-        }
-
-        $homeScore = $updatedLeague->getHomeScore();
-        if ($homeScore !== null) {
-            $game->setHomeScore($homeScore);
-        }
-
-        $winner = $updatedLeague->getWinner();
-        if ($winner !== null) {
-            $game->setWinner($winner);
-        }
-
-        $visitorOdd = $updatedLeague->getVisitorOdd();
-        if ($visitorOdd !== null) {
-            $game->setVisitorOdd($visitorOdd);
-        }
-
-        $homeOdd = $updatedLeague->getHomeOdd();
-        if ($homeOdd !== null) {
-            $game->setHomeOdd($homeOdd);
-        }
-
-        $entityManager->persist($game);
         $entityManager->flush();
 
         return $this->json(
-            $game,
+            ['message' => 'La modification a été effectuée avec succès.', 'game' => $updatedGame],
             Response::HTTP_OK,
-            [],
-            ['groups' => ['games_get_collection']]
+            ['Location' => $this->generateUrl('app_api_game', ['id' => $updatedGame->getId()])],
+            ['groups' => ['games_get_post']]
         );
     }
 }

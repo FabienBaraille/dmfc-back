@@ -30,6 +30,25 @@ class LeagueController extends AbstractController
         );
     }
 
+        /**
+     * Get rounds by league ID
+     *
+     * @Route("/api/league/{id}/round", name="app_api_rounds_by_league", methods={"GET"})
+     */
+    public function getRoundsByLeagueId(LeagueRepository $leagueRepository, $id): JsonResponse
+    {
+        $league = $leagueRepository->find($id);
+
+        if (!$league) {
+            return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
+        }
+
+        $rounds = $league->getRounds(); 
+
+        
+        return $this->json($rounds, 200, [], ['groups' => 'rounds_get_collection']);
+    }
+
     /**
     * GET league by item
     *

@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Game;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Round;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Game>
@@ -38,6 +39,23 @@ class GameRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+     * Récupère toutes les parties associées à un round donné.
+     *
+     * @param Round $round Le round pour lequel vous souhaitez récupérer les parties.
+     *
+     * @return Game[] Un tableau de parties associées au round.
+     */
+    public function findByRound(Round $round): array
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.round = :round')
+            ->setParameter('round', $round)
+            ->getQuery()
+            ->getResult();
+    }
+
 
 //    /**
 //     * @return Game[] Returns an array of Game objects
