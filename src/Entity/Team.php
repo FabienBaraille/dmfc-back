@@ -22,13 +22,13 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=3)
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
+     * @Groups({"leagues_get_collection","user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
      */
     private $trigram;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
+     * @Groups({"leagues_get_collection","user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
      */
     private $name;
 
@@ -40,7 +40,7 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
-     * @Groups ({"teams_get_collection"})
+     * @Groups ({"leagues_get_collection","teams_get_collection"})
      */
     private $logo;
 

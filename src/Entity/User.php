@@ -53,9 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $title;
 
-    /**user_get_collection","user_get_item",
+    /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item", "leagues_get_collection","user_get_collection"})
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
      */
     private $score;
 
