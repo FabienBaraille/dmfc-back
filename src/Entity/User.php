@@ -38,6 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Groups({"user_get_item", "user_get_collection"})
      */
     private $email;
 
@@ -49,41 +50,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"user_get_collection", "leagues_get_collection"})
+     * @Groups({"leagues_get_collection"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item", "leagues_get_collection","user_get_collection"})
+     * @Groups({"user_get_item", "leagues_get_collection"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_collection"})
       */
     private $oldPosition;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection","user_get_collection"})
+     * @Groups({"leagues_get_collection"})
      */
     private $position;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_collection", "user_get_item"})
+     * @Groups({"user_get_item"})
      */
     private $seasonPlayed;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"user_get_collection"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"user_get_collection"})
      */
     private $updatedAt;
 
@@ -100,7 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_collection","user_get_item", "leagues_get_users"})
+     * @Groups({"user_get_item", "leagues_get_users"})
      */
     private $team;
 

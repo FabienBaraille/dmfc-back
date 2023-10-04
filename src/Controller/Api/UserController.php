@@ -151,7 +151,7 @@ class UserController extends AbstractController
       }
 
     /**
-     * Update User
+     * Update User by Id
      *
      * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
      */
@@ -161,7 +161,7 @@ class UserController extends AbstractController
         $user = $entityManager->getRepository(User::class)->find($id);
 
         if (!$user) {
-            return $this->json(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+            return $this->json(['message' => "Cet utilisateur n'existe pas !"], Response::HTTP_NOT_FOUND);
         }
 
         // Désérialisez les données JSON de la requête en un objet User
@@ -193,7 +193,7 @@ class UserController extends AbstractController
             $newTeam = $entityManager->getRepository(Team::class)->find($newTeamId);
 
             if (!$newTeam) {
-                return $this->json(['error' => 'Equipe inexistante'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => "Cette équipe n'existe pas !"], Response::HTTP_NOT_FOUND);
             }
 
             // Associez l'utilisateur à la nouvelle équipe
@@ -209,23 +209,42 @@ class UserController extends AbstractController
             $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
 
             if (!$newLeague) {
-                return $this->json(['error' => 'New league not found.'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => "Cette ligue n'existe pas !"], Response::HTTP_NOT_FOUND);
             }
 
             // Associez l'utilisateur à la nouvelle ligue
             $user->setLeague($newLeague);
         }     
 
+        // Vérifiez l'unicité du username et de l'email avant la validation
+        $existingUserWithUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $userData['username']]);
+        $existingUserWithEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
+
+        if (($existingUserWithUsername && $existingUserWithUsername !== $user)) {
+            return $this->json(['error' => 'Le nom d\'utilisateur est déjà utilisé.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($existingUserWithEmail && $existingUserWithEmail !== $user) {
+            return $this->json(['error' => 'L\'adresse email est déjà utilisée.'], Response::HTTP_BAD_REQUEST);
+        }       
+
         // Validez les modifications apportées à l'utilisateur
         $errors = $validator->validate($user);
 
         if (count($errors) > 0) {
             $errorMessages = [];
-
+        
             foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+                $propertyPath = $error->getPropertyPath();
+                $message = $error->getMessage();
+        
+                if (!isset($errorMessages[$propertyPath])) {
+                    $errorMessages[$propertyPath] = [];
+                }
+        
+                $errorMessages[$propertyPath][] = $message;
             }
-
+        
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -235,6 +254,11 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
-        return $this->json($user, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
+        $responseData = [
+            'message' => 'Utilisateur modifié avec succès.',
+            'user' => $user, // Les données de l'utilisateur mis à jour
+        ];
+        
+        return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
     }
 }

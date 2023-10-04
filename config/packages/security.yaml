@@ -41,6 +41,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
          - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
+         - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/user, roles: ROLE_JOUEUR, methods: UPDATE }
          - { path: ^/api/users, roles: ROLE_ADMIN }
          - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/league, roles: PUBLIC_ACCESS }
