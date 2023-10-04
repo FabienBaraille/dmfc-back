@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $title;
 
-    /**user_get_collection","user_get_item",
+    /**
      * @ORM\Column(type="smallint", nullable=true)
      * @Groups({"user_get_item", "leagues_get_collection","user_get_collection"})
      */
@@ -94,6 +94,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Srprediction::class, mappedBy="User", orphanRemoval=true)
+     * @Groups({ "user_get_item"})
      */
     private $srpredictions;
 
