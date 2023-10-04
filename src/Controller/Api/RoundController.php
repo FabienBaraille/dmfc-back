@@ -5,6 +5,7 @@ use App\Entity\User;
 use App\Entity\Round;
 use App\Entity\League;
 use App\Entity\Season;
+use App\Repository\RoundRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
@@ -17,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RoundController extends AbstractController
 {
-    /**
+   /**
      * @Route("/api/create/round", name="api_id_create_round", methods={"POST"})
      */
     public function createRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
@@ -118,10 +119,8 @@ class RoundController extends AbstractController
         ['groups' => ['rounds_get_collection']]
     );
 }
-
-
 /**
- * @Route("/api/update/round/{id}", name="api_id_update_round", methods={"PUT", "PATCH"})
+ * @Route("/api/update/round/{id}", name="api_id_update_round", methods={"PUT"})
  */
 public function updateRound(Request $request, $id, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
 {
@@ -193,4 +192,5 @@ public function deleteRound($id, EntityManagerInterface $entityManager): JsonRes
 
     return $this->json(['message' => 'Tour supprimé avec succès'], Response::HTTP_OK);
 }
+ 
 }

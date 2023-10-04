@@ -17,7 +17,7 @@ class Game
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"games_get_collection", "games_get_round"})
+     * @Groups({"games_get_collection","prediction","rounds_get_collection", "games_get_round"})
      */
     private $id;
 
@@ -47,7 +47,7 @@ class Game
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"games_get_collection"})
+     * @Groups({"games_get_collection",})
      */
     private $visitorOdd;
 
