@@ -36,9 +36,9 @@ class GameController extends AbstractController
     }
 
     /**
-     * GET games by user
+     * GET games by Id
      * 
-     * @Route("/api/games/user/{id}", name="app_api_game_by_user", methods={"GET"})
+     * @Route("/api/game/{id}", name="app_api_game_by_user", methods={"GET"})
      */
     public function getGamesByUser(GameRepository $gameRepository, $id): JsonResponse
     {
