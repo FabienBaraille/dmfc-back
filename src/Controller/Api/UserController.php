@@ -53,7 +53,6 @@ class UserController extends AbstractController
                     'title' => $user->getTitle(),
                     'score' => $user->getScore(),
                     'email' => $user->getEmail()
-                    // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
                 ],
                 200,
                 [],

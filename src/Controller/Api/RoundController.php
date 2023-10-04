@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class RoundController extends AbstractController
 {
     /**
-     * @Route("/api/create/round", name="api_id_create_round", methods={"POST"})
+     * @Route("/api/round/new", name="api_id_create_round", methods={"POST"})
      */
     public function createRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
 {
@@ -121,7 +121,7 @@ class RoundController extends AbstractController
 
 
 /**
- * @Route("/api/update/round/{id}", name="api_id_update_round", methods={"PUT", "PATCH"})
+ * @Route("/api/round/{id}", name="api_id_update_round", methods={"PUT"})
  */
 public function updateRound(Request $request, $id, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
 {
@@ -176,7 +176,7 @@ public function updateRound(Request $request, $id, SerializerInterface $serializ
     );
 }
 /**
- * @Route("/api/delete/round/{id}", name="api_id_delete_round", methods={"DELETE"})
+ * @Route("/api/round/{id}", name="api_id_delete_round", methods={"DELETE"})
  */
 public function deleteRound($id, EntityManagerInterface $entityManager): JsonResponse
 {
@@ -184,13 +184,13 @@ public function deleteRound($id, EntityManagerInterface $entityManager): JsonRes
     $round = $entityManager->getRepository(Round::class)->find($id);
 
     if (!$round) {
-        return $this->json(['error' => 'Tour introuvable'], Response::HTTP_NOT_FOUND);
+        return $this->json(['error' => 'Round introuvable'], Response::HTTP_NOT_FOUND);
     }
 
     // Supprimez l'entité Round de la base de données
     $entityManager->remove($round);
     $entityManager->flush();
 
-    return $this->json(['message' => 'Tour supprimé avec succès'], Response::HTTP_OK);
+    return $this->json(['message' => 'Round supprimé avec succès'], Response::HTTP_OK);
 }
 }
