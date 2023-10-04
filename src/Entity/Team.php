@@ -22,7 +22,7 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=3)
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection"})
+     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_post"})
      */
     private $trigram;
 
@@ -40,7 +40,7 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
-     * @Groups ({"teams_get_collection"})
+     * @Groups ({"teams_get_collection", "user_get_collection"})
      */
     private $logo;
 
