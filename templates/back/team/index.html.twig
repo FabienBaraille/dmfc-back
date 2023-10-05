@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des équipes NBA{% endblock %}
+
+{% block body %}
+    <div class="container">
+    <h1>Liste des équipes NBA</h1>
+
+    <table class="table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Trigramme</th>
+                <th>nom</th>
+                <th>conférence</th>
+                <th>logo</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for team in teams %}
+            <tr>
+                <td>{{ team.id }}</td>
+                <td>{{ team.trigram }}</td>
+                <td>{{ team.name }}</td>
+                <td>{{ team.conference }}</td>
+                <td>{{ team.logo }}</td>
+                <td>
+                    <a href="#">show</a>
+                    <a href="#">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="#">Create new</a>
+    </div>
+    {% endblock %}
