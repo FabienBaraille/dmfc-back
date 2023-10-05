@@ -264,4 +264,67 @@ class UserController extends AbstractController
         
         return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
     }
+
+   /**
+ * @Route("/api/users/{id}", name="update_user_dmfc_id", methods={"PUT"})
+ */
+public function updateUserByDmfc(Request $request, User $user, ValidatorInterface $validator)
+{
+    // Récupérez les données JSON de la requête
+    $data = json_decode($request->getContent(), true);
+
+    // Mettez à jour les propriétés de l'utilisateur avec les nouvelles données
+    if (isset($data['title'])) {
+        $user->setTitle($data['title']);
+    }
+    if (isset($data['role'])) {
+        $user->setRoles($data['role']);
+    }
+
+    // Gérez le champ "team" correctement
+    if (isset($data['team'])) {
+        // Vous devez vérifier si $data['team'] est null ou une référence à une entité Team
+        if ($data['team'] === null) {
+            $user->setTeam(null); // Aucune équipe
+        } else {
+            // Vous devez récupérer l'entité Team correspondante en fonction de l'ID par exemple
+            // Assurez-vous d'ajuster cela en fonction de votre logique d'application
+            $team = $this->getDoctrine()->getRepository(Team::class)->find($data['team']);
+            if ($team) {
+                $user->setTeam($team);
+            } else {
+                return new JsonResponse(['errors' => ['team' => 'Équipe non trouvée']], 400);
+            }
+        }
+    }
+
+    // Validez les données mises à jour avec le groupe de validation
+    $violations = $validator->validate($user, null, ['update_dmfc']);
+
+    if (count($violations) > 0) {
+        // Gérez les erreurs de validation, par exemple, renvoyez une réponse JSON d'erreur
+        $errors = [];
+        foreach ($violations as $violation) {
+            $errors[$violation->getPropertyPath()] = $violation->getMessage();
+        }
+
+        return new JsonResponse(['errors' => $errors], 400);
+    }
+
+    // Sauvegardez les modifications dans la base de données
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->persist($user);
+    $entityManager->flush();
+
+    // Créez une réponse JSON pour indiquer que la mise à jour a réussi
+    $response = [
+        'message' => 'Mise à jour réussie',
+        'user_id' => $user->getId(),
+        'title' => $user->getTitle(),
+        'role' => $user->getRoles(),
+        'team' => $user->getTeam() ? $user->getTeam()->getId() : null, // Vous pouvez renvoyer l'ID de l'équipe
+    ];
+
+    return new JsonResponse($response);
+}
 }

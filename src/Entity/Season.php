@@ -24,7 +24,7 @@ class Season
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"Seasons_get_collection"})
+     * @Groups({"Seasons_get_collection","leaderbord"})
      */
     private $year;
 
