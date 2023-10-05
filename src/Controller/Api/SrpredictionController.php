@@ -122,7 +122,7 @@ public function newSrPrediction(Request $request, SerializerInterface $serialize
  /**
     * POST prediction by user update
     * 
-    * @Route("/api/prediction/update/{id}", name="update_prediction", methods={"POST"})
+    * @Route("/api/prediction/update/{id}", name="update_prediction", methods={"PUT"})
     */
     public function updateSrPrediction(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, Srprediction $srprediction): JsonResponse
     {
@@ -150,9 +150,6 @@ public function newSrPrediction(Request $request, SerializerInterface $serialize
         // Mettez à jour les champs de la prédiction existante avec les nouvelles données
         $srprediction->setPredictedWinnigTeam($updatedPrediction->getPredictedWinnigTeam());
         $srprediction->setPredictedPointDifference($updatedPrediction->getPredictedPointDifference());
-        $srprediction->setPointScored($updatedPrediction->getPointScored());
-        $srprediction->setBonusBookie($updatedPrediction->getBonusBookie());
-        $srprediction->setBonusPointsErned($updatedPrediction->getBonusPointsErned());
         $srprediction->setValidationStatus($updatedPrediction->getValidationStatus());
         $srprediction->setUpdatedAt(new \DateTime('now'));
     

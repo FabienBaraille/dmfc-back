@@ -21,13 +21,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","rounds_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","rounds_get_collection","leaderbord"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users","leaderbord","prediction"})
      */
     private $username;
 
@@ -38,76 +38,80 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Groups({"user_get_item", "user_get_collection"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","update_dmfc"})
      */
     private $roles = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"user_get_collection", "leagues_get_collection"})
+     * @Groups({"leagues_get_collection","update_dmfc"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item", "leagues_get_collection","user_get_collection"})
+     * @Groups({"user_get_item", "leagues_get_collection"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_collection"})
+     * @Groups({"league_get_collection"})
       */
     private $oldPosition;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection","user_get_collection"})
+     * @Groups({"leagues_get_collection"})
      */
     private $position;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_collection", "user_get_item"})
+     * @Groups({"user_get_item"})
      */
     private $seasonPlayed;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"user_get_collection"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"user_get_collection"})
      */
     private $updatedAt;
 
     /**
      * @ORM\OneToMany(targetEntity=Leaderboard::class, mappedBy="User", orphanRemoval=true)
+     * @Groups({"leaderbord"})
      */
     private $leaderboards;
 
     /**
      * @ORM\OneToMany(targetEntity=Srprediction::class, mappedBy="User", orphanRemoval=true)
-     * @Groups({ "user_get_item"})
+     * @Groups({"user_get_item"})
      */
     private $srpredictions;
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_collection","user_get_item"})
+     * @Groups({"user_get_item", "leagues_get_users","update_dmfc"})
      */
     private $team;
 
     /**
      * @ORM\ManyToOne(targetEntity=League::class, cascade={"persist"},inversedBy="users")
      * @ORM\JoinColumn(nullable=true)
-     * @Groups({"user_get_collection", "get_login", "user_get_item"})
+     * @Groups({"user_get_collection", "get_login", "user_get_item","leaderbord"})
      */
     private $league;
 

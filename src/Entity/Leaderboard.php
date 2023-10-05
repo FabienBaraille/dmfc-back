@@ -6,6 +6,7 @@ use App\Repository\LeaderboardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=LeaderboardRepository::class)
@@ -21,11 +22,13 @@ class Leaderboard
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leaderbord"})
      */
     private $finalScore;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"leaderbord"})
      */
     private $finalRank;
 
@@ -49,6 +52,7 @@ class Leaderboard
     /**
      * @ORM\ManyToOne(targetEntity=Season::class, inversedBy="leaderboards")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"leaderbord"})
      */
     private $Season;
 
