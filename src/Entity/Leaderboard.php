@@ -6,6 +6,7 @@ use App\Repository\LeaderboardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=LeaderboardRepository::class)
@@ -16,16 +17,19 @@ class Leaderboard
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"leagues_get_users"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_users"})
      */
     private $finalScore;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"leagues_get_users"})
      */
     private $finalRank;
 

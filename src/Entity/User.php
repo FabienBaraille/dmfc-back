@@ -91,6 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Leaderboard::class, mappedBy="User", orphanRemoval=true)
+     * @Groups({"leagues_get_users"})
      */
     private $leaderboards;
 
