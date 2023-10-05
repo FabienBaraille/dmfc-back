@@ -2,6 +2,13 @@
 
 {% block body %}
     <!-- Content -->
-        <h1>Bienvenue dans le Back Office DMFC</h1>
-        <p>Gérez votre site de pronostique de match NBA ici.</p>
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Bienvenue dans le Back Office DMFC</h1>
+        <p class="lead">Gérez votre site de pronostique de match NBA ici.</p>
+        <hr class="my-4">
+        <p>Commencez à gérer les équipes NBA, les utilisateurs et bien plus encore.</p>
+        <a class="btn btn-warning" href="{{ path('app_back_user') }}" role="button">Gérer les Utilisateurs</a>
+    </div>
+
+    <!-- Ajoutez ici des éléments de design personnalisés, des images de basket-ball en arrière-plan, etc. -->
 {% endblock %}
