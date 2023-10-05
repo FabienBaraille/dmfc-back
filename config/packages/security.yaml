@@ -40,8 +40,16 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+         # API
          - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
+         - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/user, roles: ROLE_JOUEUR, methods: UPDATE }
+         - { path: ^/api/users, roles: ROLE_ADMIN }
          - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
+         - { path: ^/api/league, roles: PUBLIC_ACCESS }
+         - { path: ^/api/news/new, roles: ROLE_DMFC }
+         - { path: ^/api/news, roles: PUBLIC_ACCESS }
+         - { path: ^/api/news, roles: ROLE_JOUEUR }
          - { path: ^/api/login, roles: PUBLIC_ACCESS }
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
