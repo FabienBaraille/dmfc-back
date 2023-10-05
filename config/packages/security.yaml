@@ -43,7 +43,11 @@ security:
          - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/login, roles: PUBLIC_ACCESS }
-         - { path: ^/api, roles: ROLE_ADMIN }
+         - { path: ^/api/round, roles: ROLE_DMFC }
+         - { path: ^/api/game, roles: ROLE_DMFC }
+         - { path: ^/api/league, roles: ROLE_DMFC }
+         - { path: ^/api/leagues, roles: ROLE_JOUEUR }
+         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
     role_hierarchy:
         ROLE_ADMIN:     ROLE_DMFC
