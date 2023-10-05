@@ -26,11 +26,7 @@ class UserController extends AbstractController
     * @Route("/api/users", name="app_api_user", methods={"GET"})
     */
     public function getUserAll(UserRepository $userRepository): JsonResponse
-    {
-        // Vérifier si l'utilisateur a la permission d'accéder à cette page
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException('Vous n\'avez pas la permission d\'accéder à cette page.');
-        }      
+    {   
         return $this->json(
             $userRepository->findAll(),
             200,
@@ -51,13 +47,14 @@ class UserController extends AbstractController
         if ($user) {
             return $this->json(
                 [
+                    'id' => $user->getId(),
                     'username' => $user->getUsername(),
+                    'email' => $user->getEmail(),
                     'roles' => $user->getRoles(),
                     'team' => $user->getTeam(),
                     'league_id' => $user->getLeague(),
                     'title' => $user->getTitle(),
-                    'score' => $user->getScore(),
-                    'email' => $user->getEmail()
+                    'score' => $user->getScore()
                 ],
                 200,
                 [],
@@ -121,8 +118,14 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
+        // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
+        $responseData = [
+            'message' => 'Utilisateur créer avec succès.',
+            'user' => $user, // Les données de l'utilisateur mis à jour
+        ];
+
             return $this->json(
-                $user,
+                $responseData,
                 Response::HTTP_CREATED,
                 [
                     'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
@@ -141,13 +144,13 @@ class UserController extends AbstractController
           $user = $entityManager->getRepository(User::class)->find($id);
 
           if (!$user) {
-              return $this->json(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+              return $this->json(['message' => 'Utilisateur non trouvé.'], Response::HTTP_NOT_FOUND);
           }
 
           $entityManager->remove($user);
           $entityManager->flush();
 
-          return $this->json(['message' => 'Utilisateur supprimé avec succès'], Response::HTTP_OK);
+          return $this->json(['message' => 'Utilisateur supprimé avec succès.'], Response::HTTP_OK);
       }
 
     /**
@@ -161,7 +164,7 @@ class UserController extends AbstractController
         $user = $entityManager->getRepository(User::class)->find($id);
 
         if (!$user) {
-            return $this->json(['message' => "Cet utilisateur n'existe pas !"], Response::HTTP_NOT_FOUND);
+            return $this->json(['message' => "Cet utilisateur n'existe pas."], Response::HTTP_NOT_FOUND);
         }
 
         // Désérialisez les données JSON de la requête en un objet User
@@ -193,7 +196,7 @@ class UserController extends AbstractController
             $newTeam = $entityManager->getRepository(Team::class)->find($newTeamId);
 
             if (!$newTeam) {
-                return $this->json(['error' => "Cette équipe n'existe pas !"], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => "Cette équipe n'existe pas."], Response::HTTP_NOT_FOUND);
             }
 
             // Associez l'utilisateur à la nouvelle équipe
