@@ -3,7 +3,7 @@
 {% block title %}Liste des utilisateurs{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
+    <div class="container mt-4 pb-auto mb-5">
         <div class="jumbotron">
             <h1 class="display-4">Liste des utilisateurs</h1>
         </div>
@@ -28,8 +28,10 @@
                     <td>{{ user.email }}</td>
                     <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
                     <td>
+                    
+                        <a href="{{ path('app_back_user_show', {'id': user.id}) }}" class="btn btn-info">Détail</a>
                         <a href="#" class="btn btn-danger">Supprimer</a>
-                        <a href="#" class="btn btn-primary">Editer</a>
+                        <a href="#" class="btn btn-warning">Modifier</a>
                     </td>
                 </tr>
                 {% else %}
