@@ -10,6 +10,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -32,19 +34,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $username;
 
     /**
+     * @var string The hashed password
      * @ORM\Column(type="string", length=180)
+     * @Assert\NotBlank
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=180)
      * @Groups({"user_get_item", "user_get_collection"})
+     * @Assert\NotBlank
+     * @Assert\Email
      */
     private $email;
 
     /**
      * @ORM\Column(type="json", nullable=true)
      * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection"})
+     * @Assert\NotBlank
      */
     private $roles = [];
 
