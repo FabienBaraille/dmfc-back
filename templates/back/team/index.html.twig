@@ -29,8 +29,8 @@
                     <td>{{ team.conference }}</td>
                     <td>{{ team.logo }}</td>
                     <td>
-                        <a href="#" class="btn btn-danger">Supprimer</a>
-                        <a href="#" class="btn btn-primary">Editer</a>
+                        <a href="{{ path('app_back_team_show', {'id': team.id}) }}" class="btn btn-info">Détail</a>
+                        <a href="{{ path('app_back_team_edit', {'id': team.id}) }}" class="btn btn-warning">Modifier</a>
                     </td>
                 </tr>
                 {% else %}

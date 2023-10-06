@@ -8,7 +8,7 @@
             <h1 class="display-4">Liste des utilisateurs</h1>
         </div>
 
-        <a href="{{ path('app_back_user_new') }}" class="btn btn-success">Créer un nouveau utilisateur</a>
+        <a href="{{ path('app_back_user_new') }}" class="btn btn-success">Créer un nouvel utilisateur</a>
 
         <table class="table table-striped">
             <thead class="thead-dark">
@@ -27,8 +27,7 @@
                     <td>{{ user.username }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-                    <td>
-                    
+                    <td>                    
                         <a href="{{ path('app_back_user_show', {'id': user.id}) }}" class="btn btn-info">Détail</a>
                         <a href="{{ path('app_back_user_edit', {'id': user.id}) }}" class="btn btn-warning">Modifier</a>
                     </td>

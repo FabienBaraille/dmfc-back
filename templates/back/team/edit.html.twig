@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editer une équipe{% endblock %}
+
+{% block body %}
+    <h1>Editer une équipe</h1>
+
+    {{ include('back/team/_form.html.twig', {'button_label': 'Modifier'}) }}
+
+    <a class="btn btn-primary" href="{{ path('app_back_team') }}">Retour à la liste</a>
+
+    {{ include('back/team/_delete_form.html.twig') }}
+{% endblock %}
