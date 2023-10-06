@@ -46,13 +46,14 @@ class UserController extends AbstractController
         if ($user) {
             return $this->json(
                 [
+                    'id' => $user->getId(),
                     'username' => $user->getUsername(),
                     'roles' => $user->getRoles(),
                     'team' => $user->getTeam(),
                     'league_id' => $user->getLeague(),
                     'title' => $user->getTitle(),
-                    'score' => $user->getScore()
-                    // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
+                    'score' => $user->getScore(),
+                    'email' => $user->getEmail()
                 ],
                 200,
                 [],

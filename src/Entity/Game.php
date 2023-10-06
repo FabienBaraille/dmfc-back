@@ -17,26 +17,23 @@ class Game
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"games_get_collection","prediction","rounds_get_collection"})
-     * 
+     * @Groups({"games_get_collection","prediction","rounds_get_collection", "games_get_round", "games_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"games_get_collection"})
+     * @Groups({"games_get_collection", "games_get_round", "games_get_post"})
      */
     private $dateAndTimeOfMatch;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"games_get_collection"})
      */
     private $visitorScore;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"games_get_collection"})
      */
     private $homeScore;
 
@@ -48,13 +45,12 @@ class Game
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"games_get_collection"})
+     * @Groups({"games_get_collection",})
      */
     private $visitorOdd;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"games_get_collection"})
      */
     private $homeOdd;
 
@@ -76,13 +72,16 @@ class Game
     /**
      * @ORM\ManyToOne(targetEntity=Round::class, inversedBy="games")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"games_get_collection"})
+     * @Groups({"games_get_collection", "games_get_post"})
      */
     private $round;
 
     /**
      * @ORM\ManyToMany(targetEntity=Team::class, inversedBy="games")
-     * @Groups({"games_get_collection"})
+     * @ORM\JoinTable(name="game_team",
+     * joinColumns={@ORM\JoinColumn(name="game_id", referencedColumnName="id")},
+     * inverseJoinColumns={@ORM\JoinColumn(name="team_id", referencedColumnName="id")})
+     * @Groups({"games_get_collection", "games_get_post"})
      */
     private $team;
 
@@ -92,9 +91,11 @@ class Game
         $this->srpredictions = new ArrayCollection();
     }
 
-    
-
-    
+    // Ajoutez la méthode clearTeams
+    public function clearTeams()
+    {
+        $this->team->clear();
+    }
 
     public function getId(): ?int
     {

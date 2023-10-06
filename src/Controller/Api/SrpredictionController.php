@@ -121,44 +121,34 @@ class SrpredictionController extends AbstractController
     
     /**
     * POST prediction by user update
-    * 
-    * @Route("/api/prediction/update/{id}", name="update_prediction", methods={"POST"})
+    *
+    * @Route("/api/prediction/update/{id}", name="update_prediction", methods={"PUT"})
     */
     public function updateSrPrediction(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, Srprediction $srprediction): JsonResponse
     {
         $jsonData = $request->getContent();
-
         // Vérifiez si l'utilisateur est authentifié
         $User = $this->security->getUser();
         if (!$User) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour modifier votre pronostic.');
         }
-
         // Vérifiez si l'utilisateur a le droit de modifier la prédiction
         if ($srprediction->getUser() !== $User) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette prédiction.');
         }
-
         // Vérifiez si la condition est "Validated"
         if ($srprediction->getValidationStatus() === 'Validated') {
             return new JsonResponse(['message' => 'La prédiction est déjà validée. Vous ne pouvez pas la modifier.'], 400);
         }
-
         // Désérialisez les données JSON en un objet
         $updatedPrediction = $serializer->deserialize($jsonData, Srprediction::class, 'json');
-
         // Mettez à jour les champs de la prédiction existante avec les nouvelles données
         $srprediction->setPredictedWinnigTeam($updatedPrediction->getPredictedWinnigTeam());
         $srprediction->setPredictedPointDifference($updatedPrediction->getPredictedPointDifference());
-        $srprediction->setPointScored($updatedPrediction->getPointScored());
-        $srprediction->setBonusBookie($updatedPrediction->getBonusBookie());
-        $srprediction->setBonusPointsErned($updatedPrediction->getBonusPointsErned());
         $srprediction->setValidationStatus($updatedPrediction->getValidationStatus());
         $srprediction->setUpdatedAt(new \DateTime('now'));
-
         // Persistez les modifications dans la base de données
         $entityManager->flush();
-
         $jsonData = $serializer->serialize($srprediction, 'json', ['groups' => 'prediction']);
         return new JsonResponse(['message' => 'Votre pronostic a été mis à jour avec succès', 'prediction' => json_decode($jsonData)]);
     }
