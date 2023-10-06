@@ -18,14 +18,14 @@ class Round
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"rounds_get_collection", "games_get_collection", "games_get_post"})
+     * @Groups({"games_get_collection", "games_get_post", "seasons_get_collection", "rounds_get_collection})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"leagues_get_collection","rounds_get_collection", "games_get_collection", "games_get_post"})
-    */
+     * @Groups({"games_get_collection", "games_get_post", "rounds_get_collection", "seasons_get_collection", "leagues_get_collection"})
+     */
     private $name;
 
     /**
