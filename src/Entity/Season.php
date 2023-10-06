@@ -9,7 +9,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-
 /**
  * @ORM\Entity(repositoryClass=SeasonRepository::class)
  */
@@ -25,7 +24,7 @@ class Season
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"seasons_get_collection"})
+     * @Groups({"seasons_get_collection","leaderbord"})
      */
     private $year;
 

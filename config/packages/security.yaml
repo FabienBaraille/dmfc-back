@@ -40,12 +40,33 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-         - { path: ^/admin, roles: ROLE_ADMIN }
-         - { path: ^/profile, roles: ROLE_USER }
+         # API
          - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
-         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+         - { path: ^/api/users/id, roles: ROLE_DMFC, methods: UPDATE }
+         - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/user, roles: ROLE_JOUEUR, methods: UPDATE }
+         - { path: ^/api/users, roles: ROLE_ADMIN }
+         - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/leagues, roles: PUBLIC_ACCESS }
-         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+         - { path: ^/api/league, roles: ROLE_JOUEUR }
+         - { path: ^/api/leagues/id, roles: ROLE_ADMIN, methods: DELETE}
+         - { path: ^/api/leagues/id, roles: ROLE_DMFC, methods: UPDATE}
+         - { path: ^/api/league/id/users/leaderbord, roles: ROLE_JOUEUR }
+         - { path: ^/api/news/new, roles: ROLE_DMFC }
+         - { path: ^/api/news, roles: PUBLIC_ACCESS }
+         - { path: ^/api/news, roles: ROLE_JOUEUR }
+         - { path: ^/api/prediction/new, roles: ROLE_JOUEUR }
+         - { path: ^/api/prediction, roles: ROLE_JOUEUR, methods: UPDATE }
+         - { path: ^/api/prediction, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/round/new, roles: ROLE_DMFC }
+         - { path: ^/api/round, roles: ROLE_DMFC, methods: UPDATE }
+         - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
+         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+    role_hierarchy:
+        ROLE_ADMIN:     ROLE_DMFC
+        ROLE_DMFC:      ROLE_JOUEUR
 
 when@test:
     security:

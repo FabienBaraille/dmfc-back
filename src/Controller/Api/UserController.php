@@ -8,14 +8,15 @@ use App\Entity\League;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Security;
 
 class UserController extends AbstractController
 {
@@ -25,7 +26,7 @@ class UserController extends AbstractController
     * @Route("/api/users", name="app_api_user", methods={"GET"})
     */
     public function getUserAll(UserRepository $userRepository): JsonResponse
-    {
+    {   
         return $this->json(
             $userRepository->findAll(),
             200,
@@ -46,13 +47,14 @@ class UserController extends AbstractController
         if ($user) {
             return $this->json(
                 [
+                    'id' => $user->getId(),
                     'username' => $user->getUsername(),
+                    'email' => $user->getEmail(),
                     'roles' => $user->getRoles(),
                     'team' => $user->getTeam(),
                     'league_id' => $user->getLeague(),
                     'title' => $user->getTitle(),
                     'score' => $user->getScore()
-                    // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
                 ],
                 200,
                 [],
@@ -116,8 +118,14 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
+        // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
+        $responseData = [
+            'message' => 'Utilisateur créer avec succès.',
+            'user' => $user, // Les données de l'utilisateur mis à jour
+        ];
+
             return $this->json(
-                $user,
+                $responseData,
                 Response::HTTP_CREATED,
                 [
                     'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
@@ -136,17 +144,17 @@ class UserController extends AbstractController
           $user = $entityManager->getRepository(User::class)->find($id);
 
           if (!$user) {
-              return $this->json(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+              return $this->json(['message' => 'Utilisateur non trouvé.'], Response::HTTP_NOT_FOUND);
           }
 
           $entityManager->remove($user);
           $entityManager->flush();
 
-          return $this->json(['message' => 'Utilisateur supprimé avec succès'], Response::HTTP_OK);
+          return $this->json(['message' => 'Utilisateur supprimé avec succès.'], Response::HTTP_OK);
       }
 
     /**
-     * Update User
+     * Update User by Id
      *
      * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
      */
@@ -156,7 +164,7 @@ class UserController extends AbstractController
         $user = $entityManager->getRepository(User::class)->find($id);
 
         if (!$user) {
-            return $this->json(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+            return $this->json(['message' => "Cet utilisateur n'existe pas."], Response::HTTP_NOT_FOUND);
         }
 
         // Désérialisez les données JSON de la requête en un objet User
@@ -188,7 +196,7 @@ class UserController extends AbstractController
             $newTeam = $entityManager->getRepository(Team::class)->find($newTeamId);
 
             if (!$newTeam) {
-                return $this->json(['error' => 'Equipe inexistante'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => "Cette équipe n'existe pas."], Response::HTTP_NOT_FOUND);
             }
 
             // Associez l'utilisateur à la nouvelle équipe
@@ -204,23 +212,42 @@ class UserController extends AbstractController
             $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
 
             if (!$newLeague) {
-                return $this->json(['error' => 'New league not found.'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => "Cette ligue n'existe pas !"], Response::HTTP_NOT_FOUND);
             }
 
             // Associez l'utilisateur à la nouvelle ligue
             $user->setLeague($newLeague);
         }     
 
+        // Vérifiez l'unicité du username et de l'email avant la validation
+        $existingUserWithUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $userData['username']]);
+        $existingUserWithEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
+
+        if (($existingUserWithUsername && $existingUserWithUsername !== $user)) {
+            return $this->json(['error' => 'Le nom d\'utilisateur est déjà utilisé.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($existingUserWithEmail && $existingUserWithEmail !== $user) {
+            return $this->json(['error' => 'L\'adresse email est déjà utilisée.'], Response::HTTP_BAD_REQUEST);
+        }       
+
         // Validez les modifications apportées à l'utilisateur
         $errors = $validator->validate($user);
 
         if (count($errors) > 0) {
             $errorMessages = [];
-
+        
             foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+                $propertyPath = $error->getPropertyPath();
+                $message = $error->getMessage();
+        
+                if (!isset($errorMessages[$propertyPath])) {
+                    $errorMessages[$propertyPath] = [];
+                }
+        
+                $errorMessages[$propertyPath][] = $message;
             }
-
+        
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -230,6 +257,74 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
-        return $this->json($user, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
+        $responseData = [
+            'message' => 'Utilisateur modifié avec succès.',
+            'user' => $user, // Les données de l'utilisateur mis à jour
+        ];
+        
+        return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
     }
+
+   /**
+ * @Route("/api/users/{id}", name="update_user_dmfc_id", methods={"PUT"})
+ */
+public function updateUserByDmfc(Request $request, User $user, ValidatorInterface $validator)
+{
+    // Récupérez les données JSON de la requête
+    $data = json_decode($request->getContent(), true);
+
+    // Mettez à jour les propriétés de l'utilisateur avec les nouvelles données
+    if (isset($data['title'])) {
+        $user->setTitle($data['title']);
+    }
+    if (isset($data['role'])) {
+        $user->setRoles($data['role']);
+    }
+
+    // Gérez le champ "team" correctement
+    if (isset($data['team'])) {
+        // Vous devez vérifier si $data['team'] est null ou une référence à une entité Team
+        if ($data['team'] === null) {
+            $user->setTeam(null); // Aucune équipe
+        } else {
+            // Vous devez récupérer l'entité Team correspondante en fonction de l'ID par exemple
+            // Assurez-vous d'ajuster cela en fonction de votre logique d'application
+            $team = $this->getDoctrine()->getRepository(Team::class)->find($data['team']);
+            if ($team) {
+                $user->setTeam($team);
+            } else {
+                return new JsonResponse(['errors' => ['team' => 'Équipe non trouvée']], 400);
+            }
+        }
+    }
+
+    // Validez les données mises à jour avec le groupe de validation
+    $violations = $validator->validate($user, null, ['update_dmfc']);
+
+    if (count($violations) > 0) {
+        // Gérez les erreurs de validation, par exemple, renvoyez une réponse JSON d'erreur
+        $errors = [];
+        foreach ($violations as $violation) {
+            $errors[$violation->getPropertyPath()] = $violation->getMessage();
+        }
+
+        return new JsonResponse(['errors' => $errors], 400);
+    }
+
+    // Sauvegardez les modifications dans la base de données
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->persist($user);
+    $entityManager->flush();
+
+    // Créez une réponse JSON pour indiquer que la mise à jour a réussi
+    $response = [
+        'message' => 'Mise à jour réussie',
+        'user_id' => $user->getId(),
+        'title' => $user->getTitle(),
+        'role' => $user->getRoles(),
+        'team' => $user->getTeam() ? $user->getTeam()->getId() : null, // Vous pouvez renvoyer l'ID de l'équipe
+    ];
+
+    return new JsonResponse($response);
+}
 }

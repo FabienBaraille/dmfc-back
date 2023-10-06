@@ -16,19 +16,19 @@ class Team
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection"})
+     * @Groups({"user_get_item", "teams_get_collection","update_dmfc"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=3)
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection", "games_get_post"})
+     * @Groups({"user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users"})
      */
     private $trigram;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection", "games_get_post"})
+     * @Groups({"user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users"})
      */
     private $name;
 
@@ -40,7 +40,7 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
-     * @Groups ({"teams_get_collection"})
+     * @Groups ({"teams_get_collection", "user_get_item", "leagues_get_users"})
      */
     private $logo;
 
