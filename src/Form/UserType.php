@@ -18,8 +18,8 @@ class UserType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'label' => 'Nom d\'utilisateur',
-                'required' => true, // Le champ est obligatoire
+                'label' => 'Pseudo',
+                'empty_data' => '',
             ])
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                 // en JS : event.currentTarget
@@ -45,9 +45,10 @@ class UserType extends AbstractType
                     // add
                     $form->add('password');
                 }
-            })            ->add('email', EmailType::class, [
+            })          
+            ->add('email', EmailType::class, [
                 'label' => 'Adresse e-mail',
-                'required' => true,
+                'empty_data' => '',
             ])
             ->add('roles', ChoiceType::class, [
                 'label' => 'Rôles',

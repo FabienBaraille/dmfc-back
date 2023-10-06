@@ -2,6 +2,7 @@
 
 namespace App\Controller\Back;
 
+
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -14,7 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserController extends AbstractController
 {
     /**
-     * @Route("/back/user", name="app_back_user")
+     * @Route("/back/user", name="app_back_user", methods={"GET"})
      */
     public function index(UserRepository $userRepository): Response
     {

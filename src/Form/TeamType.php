@@ -3,11 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Team;
-use Doctrine\DBAL\Types\TextType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class TeamType extends AbstractType
 {
@@ -24,7 +24,7 @@ class TeamType extends AbstractType
                     'Eastern' => "Eastern",
                     'Western' => "Western"
                 ],
-                'multiple' => true,
+                'multiple' => false,
                 'expanded' => true,
             ])
             ->add('logo')

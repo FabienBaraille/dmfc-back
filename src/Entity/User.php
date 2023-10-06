@@ -30,6 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=60, unique=true)
      * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users"})
+     * @Assert\NotBlank
      */
     private $username;
 
