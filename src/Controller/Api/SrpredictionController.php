@@ -121,7 +121,7 @@ class SrpredictionController extends AbstractController
     
     /**
     * POST prediction by user update
-    *
+    * 
     * @Route("/api/prediction/update/{id}", name="update_prediction", methods={"PUT"})
     */
     public function updateSrPrediction(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, Srprediction $srprediction): JsonResponse

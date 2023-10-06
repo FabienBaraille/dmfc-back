@@ -24,7 +24,7 @@ class Season
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"seasons_get_collection"})
+     * @Groups({"seasons_get_collection","leaderbord"})
      */
     private $year;
 
@@ -45,7 +45,7 @@ class Season
 
     /**
      * @ORM\OneToMany(targetEntity=Round::class, mappedBy="season", orphanRemoval=true)
-     * @Groups({"Seasons_get_collection"})
+     * @Groups({"seasons_get_collection"})
      */
     private $rounds;
 
