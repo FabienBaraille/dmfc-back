@@ -35,6 +35,11 @@ class RoundController extends AbstractController
       return $this->json(['error' => 'La clé "season" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
     }
 
+    // Vérifiez si "year" existe dans les données JSON
+    if (!isset($roundData['season']['year'])) {
+      return $this->json(['error' => 'La clé "year" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+    }
+
     // Autres vérifications pour s'assurer que d'autres données requises existent
     if (!isset($roundData['user_id'])) {
       return $this->json(['error' => 'La clé "user_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
@@ -58,8 +63,8 @@ class RoundController extends AbstractController
     }
 
     // Récupérez l'année depuis les données JSON et associez-la à la saison (Season)
-    /*$year = $roundData['season']['year'];
-    $season->setYear($year);*/
+    $year = $roundData['season']['year'];
+    $season->setYear($year);
 
     // Associez la saison au tour (Round)
     $round->setSeason($season);
