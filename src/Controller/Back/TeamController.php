@@ -5,6 +5,7 @@ namespace App\Controller\Back;
 use App\Entity\Team;
 use App\Form\TeamType;
 use App\Repository\TeamRepository;
+use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,14 +34,14 @@ class TeamController extends AbstractController
     }
 
     /**
-     * @Route("/back/team/new", name="app_back_team_new", methods={"GET", "POST"})
+     * @Route("/back/new/team", name="app_back_team_new", methods={"GET", "POST"})
      */
     public function new(Request $request, TeamRepository $teamRepository): Response
     {
         $team = new Team();
         $form = $this->createForm(TeamType::class, $team);
         $form->handleRequest($request);
-
+        $team->setCreatedAt(new DateTime());
         if ($form->isSubmitted() && $form->isValid()) {
 
             $teamRepository->add($team, true);

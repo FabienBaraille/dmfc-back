@@ -35,7 +35,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/back/user/new", name="app_back_user_new", methods={"GET", "POST"})
+     * @Route("/back/new/user", name="app_back_user_new", methods={"GET", "POST"})
      */
     public function new(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
     {
