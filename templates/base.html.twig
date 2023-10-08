@@ -23,20 +23,21 @@
                 <img src="{{ asset('images/logo_dmfc.png') }}" alt="Logo DMFC" height="60">
                 Back Office DMFC
             </a>        
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ path('app_back_home') }}">Accueil</a>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <a class="nav-link active" href="{{ path('app_back_home') }}">Accueil</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_back_user') }}">Utilisateurs</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_back_team') }}">Équipes NBA</a>
-                    </li>
+                    </li>                    
                     <li class="nav-item">
                         <a class="nav-link" href="#">Saisons</a>
                     </li>
@@ -51,16 +52,11 @@
         {% endblock %}
     </div>
 </body>
-    <footer class="footer bg-dark text-white py-3 border-top text-center">
+    <footer class="container-fluid bg-dark text-white py-4 border-top text-center">
         <span>© 2023 Back Office DFMC
         </span>
     </footer>
-    <!-- Footer -->
-    {# <footer class="footer bg-dark text-white text-center py-2">
-        © 2023 Back Office DFMC
-    </footer> #}
 
     <!-- Inclure les fichiers JavaScript de Bootstrap (jQuery est requis) -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script>
 </html>
