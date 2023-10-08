@@ -70,7 +70,6 @@ class UserController extends AbstractController
 
             // si le champ de form "password" est rempli
             $formPassword = $form->get('password')->getData();
-            // dd($formPassword);
 
             if ($formPassword !== null) {
                 // on hache le mot de passe

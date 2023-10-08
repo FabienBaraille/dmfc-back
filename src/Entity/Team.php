@@ -11,7 +11,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=TeamRepository::class)
- * @UniqueEntity("trigram", "name")
+ * @UniqueEntity(fields="trigram", message="Ce trigramme existe déjà.")
+ * @UniqueEntity(fields="name", message="Ce nom d'équipe existe déjà.")
  */
 class Team
 {
