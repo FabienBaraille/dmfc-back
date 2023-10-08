@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle équipe{% endblock %}
+
+{% block body %}
+    <h1>Créer une nouvelle équipe</h1>
+
+    {{ include('back/team/_form.html.twig') }}
+
+    <a class="btn btn-primary mt-1" href="{{ path('app_back_team') }}">Retour à la liste</a>
+{% endblock %}

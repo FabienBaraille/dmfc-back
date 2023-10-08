@@ -18,19 +18,19 @@ class League
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection","get_login_league"}, {"leagues_get_collection"})
+     * @Groups({"user_get_collection","get_login_league","leagues_get_collection", "user_get_item", "news_get_item","rounds_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180)
-     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
+     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection", "news_get_collection", "user_get_item","rounds_get_collection","leaderbord"})
      */
     private $leagueName;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
+     * @Groups({"leagues_get_collection"})
      */
     private $leagueDescription;
 
@@ -46,12 +46,12 @@ class League
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="league")
-     * @Groups({"get_league"})
      */
     private $users;
 
     /**
      * @ORM\OneToMany(targetEntity=Round::class, mappedBy="league", orphanRemoval=true)
+     * @Groups({"rounds_get_collection"})
      */
     private $rounds;
 
@@ -65,7 +65,6 @@ class League
         $this->users = new ArrayCollection();
         $this->rounds = new ArrayCollection();
         $this->news = new ArrayCollection();
-        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int

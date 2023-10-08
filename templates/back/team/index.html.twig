@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des équipes NBA{% endblock %}
+
+{% block body %}
+    <div class="container mt-4 pb-auto mb-5">
+        <div class="jumbotron">
+            <h1 class="display-4">Liste des équipes NBA</h1>
+        </div>
+
+        <a href="{{ path('app_back_team_new') }}" class="btn btn-success">Créer une nouvelle équipe</a>
+
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Trigramme</th>
+                    <th>nom</th>
+                    <th>conférence</th>
+                    <th>logo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                <tr>
+                    <td>{{ team.id }}</td>
+                    <td>{{ team.trigram }}</td>
+                    <td>{{ team.name }}</td>
+                    <td>{{ team.conference }}</td>
+                    <td>{{ team.logo }}</td>
+                    <td>
+                        <a href="{{ path('app_back_team_show', {'id': team.id}) }}" class="btn btn-info">Détail</a>
+                        <a href="{{ path('app_back_team_edit', {'id': team.id}) }}" class="btn btn-warning">Modifier</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">Aucun enregistrement trouvé</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

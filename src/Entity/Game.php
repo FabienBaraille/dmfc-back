@@ -6,6 +6,7 @@ use App\Repository\GameRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=GameRepository::class)
@@ -16,11 +17,13 @@ class Game
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"games_get_collection","prediction","rounds_get_collection", "games_get_round", "games_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"games_get_collection", "games_get_round", "games_get_post"})
      */
     private $dateAndTimeOfMatch;
 
@@ -36,11 +39,13 @@ class Game
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
+     * @Groups({"games_get_collection"})
      */
     private $winner;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups({"games_get_collection",})
      */
     private $visitorOdd;
 
@@ -67,11 +72,16 @@ class Game
     /**
      * @ORM\ManyToOne(targetEntity=Round::class, inversedBy="games")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"games_get_collection", "games_get_post"})
      */
     private $round;
 
     /**
      * @ORM\ManyToMany(targetEntity=Team::class, inversedBy="games")
+     * @ORM\JoinTable(name="game_team",
+     * joinColumns={@ORM\JoinColumn(name="game_id", referencedColumnName="id")},
+     * inverseJoinColumns={@ORM\JoinColumn(name="team_id", referencedColumnName="id")})
+     * @Groups({"games_get_collection", "games_get_post"})
      */
     private $team;
 
@@ -81,9 +91,11 @@ class Game
         $this->srpredictions = new ArrayCollection();
     }
 
-    
-
-    
+    // Ajoutez la méthode clearTeams
+    public function clearTeams()
+    {
+        $this->team->clear();
+    }
 
     public function getId(): ?int
     {

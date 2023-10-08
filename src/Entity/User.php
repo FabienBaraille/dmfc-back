@@ -2,18 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity("username")
+ * @UniqueEntity(fields="username", message="Ce nom d'utilisateur existe déjà.")
+ * @UniqueEntity(fields="email", message="Cet email existe déjà.")
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -21,46 +24,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","rounds_get_collection","leaderbord"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"user_get_collection", "user_get_item", "get_login", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users","leaderbord","prediction"})
+     * @Assert\NotBlank
      */
     private $username;
 
     /**
+     * @var string The hashed password
      * @ORM\Column(type="string", length=180)
+     * @Assert\NotBlank
      */
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=180)
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"user_get_item", "user_get_collection"})
+     * @Assert\NotBlank
+     * @Assert\Email
      */
     private $email;
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"user_get_collection", "user_get_item","get_login_league", "get_login", "leagues_get_collection"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","update_dmfc"})
+     * @Assert\NotBlank
      */
     private $roles = [];
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"user_get_collection","get_login_league", "leagues_get_collection"})
+     * @Groups({"leagues_get_collection","update_dmfc"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item","get_login_league", "leagues_get_collection"})
+     * @Groups({"user_get_item", "leagues_get_collection"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"league_get_collection"})
       */
     private $oldPosition;
 
@@ -72,40 +83,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_collection", "user_get_item"})
+     * @Groups({"user_get_item"})
      */
     private $seasonPlayed;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"user_get_collection"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"user_get_collection"})
      */
     private $updatedAt;
 
     /**
      * @ORM\OneToMany(targetEntity=Leaderboard::class, mappedBy="User", orphanRemoval=true)
+     * @Groups({"leagues_get_users", "leaderbord"})
      */
     private $leaderboards;
 
     /**
      * @ORM\OneToMany(targetEntity=Srprediction::class, mappedBy="User", orphanRemoval=true)
+     * @Groups({"user_get_item"})
      */
     private $srpredictions;
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_collection","user_get_item", "get_login"})
+     * @Groups({"user_get_item", "leagues_get_users","update_dmfc"})
      */
     private $team;
 
     /**
      * @ORM\ManyToOne(targetEntity=League::class, cascade={"persist"},inversedBy="users")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"user_get_collection", "get_login"})
+     * @ORM\JoinColumn(nullable=true)
+     * @Groups({"user_get_collection", "get_login", "user_get_item","leaderbord"})
      */
     private $league;
 
@@ -116,7 +131,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
         $this->rounds = new ArrayCollection();
@@ -184,7 +198,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): ?array
     {
         $roles = $this->roles;
-        $roles[] = 'ROLE_JOUEUR';
+        // $roles[] = 'ROLE_JOUEUR';
 
         return array_unique($roles);
     }

@@ -3,12 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\TeamRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=TeamRepository::class)
+ * @UniqueEntity(fields="trigram", message="Ce trigramme existe déjà.")
+ * @UniqueEntity(fields="name", message="Ce nom d'équipe existe déjà.")
  */
 class Team
 {
@@ -16,26 +20,34 @@ class Team
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"user_get_item", "teams_get_collection","update_dmfc"})
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=3)
+     * @ORM\Column(type="string", length=3, unique=true)
+     * @Groups({"user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users"})
+     * @Assert\NotBlank
      */
     private $trigram;
 
     /**
-     * @ORM\Column(type="string", length=60)
+     * @ORM\Column(type="string", length=60, unique=true)
+     * @Groups({"user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users"})
+     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups ({"teams_get_collection"})
+     * @Assert\NotBlank
      */
     private $conference;
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
+     * @Groups ({"teams_get_collection", "user_get_item", "leagues_get_users"})
      */
     private $logo;
 
