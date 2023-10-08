@@ -130,7 +130,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
         $this->rounds = new ArrayCollection();

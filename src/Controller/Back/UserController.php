@@ -6,6 +6,7 @@ namespace App\Controller\Back;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -46,6 +47,7 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
             $user->setPassword($hashedPassword);
+            $user->setCreatedAt(new DateTime());
 
             $userRepository->add($user, true);
 
@@ -65,7 +67,8 @@ class UserController extends AbstractController
     {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
-
+        $user->setUpdatedAt(new DateTime());
+        
         if ($form->isSubmitted() && $form->isValid()) {
 
             // si le champ de form "password" est rempli

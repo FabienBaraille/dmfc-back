@@ -62,6 +62,8 @@ class TeamController extends AbstractController
     {
         $form = $this->createForm(TeamType::class, $team);
         $form->handleRequest($request);
+        $team->setUpdatedAt(new DateTime());
+
 
         if ($form->isSubmitted() && $form->isValid()) {
                 

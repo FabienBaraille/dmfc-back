@@ -15,7 +15,9 @@ class TeamType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('trigram')
+            ->add('trigram', TextType::class, [
+                'label' => "Trigramme de l'équipe"
+            ])
             ->add('name', TextType::class, [
                 'label' => "Nom de l'équipe NBA"
             ])
