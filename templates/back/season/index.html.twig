@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des saisons{% endblock %}
+
+{% block body %}
+    <div class="container mt-4 pb-auto mb-5">
+        <div class="jumbotron">
+            <h1 class="display-4">Liste des saisons</h1>
+        </div>
+
+        <a href="{{ path('app_back_season_new') }}" class="btn btn-success">Créer une nouvelle saison</a>
+
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Année</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for season in seasons %}
+                <tr>
+                    <td>{{ season.id }}</td>
+                    <td>{{ season.year }}</td>
+                    <td>
+                        <a href="{{ path('app_back_season_show', {'id': season.id}) }}" class="btn btn-info">Détail</a>
+                        <a href="{{ path('app_back_season_edit', {'id': season.id}) }}" class="btn btn-warning">Modifier</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">Aucun enregistrement trouvé</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

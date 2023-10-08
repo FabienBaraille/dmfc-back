@@ -30,7 +30,7 @@ class LeagueController extends AbstractController
         );
     }
 
-        /**
+    /**
      * Get rounds by league ID
      *
      * @Route("/api/league/{id}/round", name="app_api_rounds_by_league", methods={"GET"})
@@ -50,9 +50,9 @@ class LeagueController extends AbstractController
     }
 
     /**
-    * GET league by item
-    *
-    * @Route("/api/league/{id}", name="app_api_league_id", methods={"GET"})
+     * GET league by item
+     *
+     * @Route("/api/league/{id}", name="app_api_league_id", methods={"GET"})
     */
     public function getLeagueById(LeagueRepository $leagueRepository, $id): JsonResponse
     {

@@ -77,8 +77,14 @@ class NewsController extends AbstractController
         $entityManager->persist($news);
         $entityManager->flush();
 
+        // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
+        $responseData = [
+            'message' => 'Utilisateur créer avec succès.',
+            'news' => $news, // Les données de l'utilisateur mis à jour
+        ];
+
             return $this->json(
-                $news,
+                $responseData,
                 Response::HTTP_CREATED,
                 [
                     'Location' => $this->generateUrl('app_api_news', ['id' => $news->getId()]),
