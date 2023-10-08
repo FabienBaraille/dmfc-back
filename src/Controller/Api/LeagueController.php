@@ -224,4 +224,31 @@ class LeagueController extends AbstractController
             ['groups' => ['leagues_get_collection']]
         );
     }
+    /**
+     * GET User By League
+     * 
+     * @Route("/api/league/{id}/users/leaderbord", name="app_league_id_users_leaderbord", methods={"GET"})
+     */
+    public function getLeaderbordByUsersByLeague(LeagueRepository $leagueRepository, $id): JsonResponse
+    {
+        $league = $leagueRepository->find($id);
+
+        if (!$league) {
+            return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
+        }
+
+        $users = $league->getUsers();
+
+        if (empty($users)) {
+            return $this->json(['message' => "Aucun utilisateur trouvé dans cette ligue"], Response::HTTP_OK);
+        }
+        
+        return $this->json(
+            $users,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['leaderbord']]
+        );
+    }
+
 }
