@@ -159,6 +159,33 @@ public function newSrPrediction(Request $request, SerializerInterface $serialize
         $jsonData = $serializer->serialize($srprediction, 'json', ['groups' => 'prediction']);
         return new JsonResponse(['message' => 'Votre pronostic a été mis à jour avec succès', 'prediction' => json_decode($jsonData)]);
     }
+
+    /**
+     * GET predictions by game ID
+     *
+     * @Route("/api/srprediction/game/{gameId}", name="app_api_srprediction_by_game_id", methods={"GET"})
+     */
+    public function getSrpredictionsByGameId(SrpredictionRepository $predictionRepository, $gameId): JsonResponse
+    {
+        // Recherchez le jeu par son ID
+        $game = $this->getDoctrine()->getRepository(Game::class)->find($gameId);
+
+        if (!$game) {
+            return $this->json(['error' => 'Game not found'], 404);
+        }
+
+        // Récupérez toutes les prédictions associées à ce jeu
+        $predictions = $predictionRepository->findBy(['Game' => $game]);
+
+        // Vous pouvez renvoyer les prédictions sous forme de réponse JSON
+        return $this->json(
+            $predictions,
+            200,
+            [],
+            ['groups' => 'prediction']
+        );
+    }
+
 }
 
 
