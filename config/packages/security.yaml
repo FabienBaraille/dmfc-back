@@ -79,14 +79,14 @@ security:
          - { path: ^/api/round, roles: ROLE_DMFC, methods: UPDATE }
          - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
          - { path: ^/api/seasons, roles: ROLE_JOUEUR }
-         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-
-
-         - { path: ^/api/back/team, roles: ROLE_ADMIN }
-         - { path: ^/api/back/user, roles: ROLE_ADMIN }
-         - { path: ^/api/back, roles: PUBLIC_ACCESS }
-
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+         # Back
+         - { path: ^/back/logout, roles: PUBLIC_ACCESS }
+         - { path: ^/back/login, roles: PUBLIC_ACCESS }
+         - { path: ^/back/home, roles: PUBLIC_ACCESS }
+         - { path: ^/back, roles: ROLE_ADMIN }
+
 
     role_hierarchy:
         ROLE_ADMIN:     ROLE_DMFC
