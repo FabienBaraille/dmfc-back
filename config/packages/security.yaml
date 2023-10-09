@@ -61,6 +61,7 @@ security:
          - { path: ^/api/round/new, roles: ROLE_DMFC }
          - { path: ^/api/round, roles: ROLE_DMFC, methods: UPDATE }
          - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
+         - { path: ^/api/seasons, roles: ROLE_JOUEUR }
          - { path: ^/api/login, roles: PUBLIC_ACCESS }
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 

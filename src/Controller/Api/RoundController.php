@@ -35,6 +35,11 @@ class RoundController extends AbstractController
       return $this->json(['error' => 'La clé "season" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
     }
 
+    // Vérifiez si "year" existe dans les données JSON
+    if (!isset($roundData['season']['year'])) {
+      return $this->json(['error' => 'La clé "year" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+    }
+
     // Autres vérifications pour s'assurer que d'autres données requises existent
     if (!isset($roundData['user_id'])) {
       return $this->json(['error' => 'La clé "user_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
