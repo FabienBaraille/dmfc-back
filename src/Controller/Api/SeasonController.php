@@ -27,7 +27,7 @@ class SeasonController extends AbstractController
             $seasonRepository->findAll(),
             Response::HTTP_OK,
             [],
-            ['groups' => 'Seasons_get_collection']
+            ['groups' => 'seasons_get_collection']
         );
     }
 
