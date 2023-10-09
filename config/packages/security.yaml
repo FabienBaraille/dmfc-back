@@ -10,7 +10,7 @@ security:
                 class: App\Entity\User
                 property: username
     firewalls:
-    
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -36,6 +36,23 @@ security:
             pattern:   ^/api
             stateless: true
             jwt: ~
+
+        main:
+            lazy: true
+            provider: app_user_provider
+        
+            form_login:
+                # "app_auth_login" is the name of the route created previously
+                login_path: app_auth_login
+                check_path: app_auth_login
+                default_target_path: app_back_home
+
+            # logout
+            logout:
+                # chemin ou nom de route
+                path: app_auth_logout
+                target: app_back_home
+
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
@@ -63,6 +80,12 @@ security:
          - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
          - { path: ^/api/seasons, roles: ROLE_JOUEUR }
          - { path: ^/api/login, roles: PUBLIC_ACCESS }
+
+
+         - { path: ^/api/back/team, roles: ROLE_ADMIN }
+         - { path: ^/api/back/user, roles: ROLE_ADMIN }
+         - { path: ^/api/back, roles: PUBLIC_ACCESS }
+
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
     role_hierarchy:
