@@ -15,7 +15,7 @@ class Srprediction
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     *  @Groups({"prediction"})
+     * @Groups({"prediction"})
      */
     private $id;
 
@@ -57,7 +57,6 @@ class Srprediction
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"prediction"})
      */
     private $createdAt;
 
