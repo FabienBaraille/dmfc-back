@@ -28,7 +28,7 @@ class Season
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"Seasons_get_collection","leaderbord"})
+     * @Groups({"seasons_get_collection","leaderbord"})
      * @Assert\NotBlank
      */
     private $year;

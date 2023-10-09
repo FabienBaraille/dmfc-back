@@ -61,6 +61,7 @@ security:
          - { path: ^/api/round/new, roles: ROLE_DMFC }
          - { path: ^/api/round, roles: ROLE_DMFC, methods: UPDATE }
          - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
+         - { path: ^/api/seasons, roles: ROLE_JOUEUR }
          - { path: ^/api/login, roles: PUBLIC_ACCESS }
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
@@ -80,3 +81,4 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+                

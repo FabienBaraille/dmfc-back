@@ -65,13 +65,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item", "leagues_get_collection"})
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"league_get_collection"})
+     * @Groups({"user_get_collection", "leagues_get_collection"})
       */
     private $oldPosition;
 
@@ -113,7 +113,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_item", "leagues_get_users","update_dmfc"})
+     * @Groups({"user_get_collection","user_get_item", "leagues_get_collection", "leagues_get_users","update_dmfc"})
      */
     private $team;
 
@@ -414,7 +414,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-    return (string) $this->username;
+        return (string) $this->username;
     }
 
     /**
