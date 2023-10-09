@@ -41,11 +41,11 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
          # API
+         - { path: ^/api/user/id/dmfc, roles: ROLE_DMFC, methods: UPDATE }
+         - { path: ^/api/users, roles: ROLE_ADMIN }
          - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
-         - { path: ^/api/users/id, roles: ROLE_DMFC, methods: UPDATE }
          - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
          - { path: ^/api/user, roles: ROLE_JOUEUR, methods: UPDATE }
-         - { path: ^/api/users, roles: ROLE_ADMIN }
          - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/leagues, roles: PUBLIC_ACCESS }
          - { path: ^/api/league, roles: ROLE_JOUEUR }
