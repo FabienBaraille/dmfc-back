@@ -203,22 +203,7 @@ class UserController extends AbstractController
             $user->setTeam($newTeam);
         }
 
-        // Mise à jour de la relation "league"
-        if (isset($userData['league'])) {
-            // Récupérez l'ID de la nouvelle ligue
-            $newLeagueId = $userData['league'];
-
-            // Récupérez la ligue depuis la base de données
-            $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
-
-            if (!$newLeague) {
-                return $this->json(['error' => "Cette ligue n'existe pas !"], Response::HTTP_NOT_FOUND);
-            }
-
-            // Associez l'utilisateur à la nouvelle ligue
-            $user->setLeague($newLeague);
-        }     
-
+        
         // Vérifiez l'unicité du username et de l'email avant la validation
         $existingUserWithUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $userData['username']]);
         $existingUserWithEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
@@ -259,10 +244,9 @@ class UserController extends AbstractController
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
             'message' => 'Utilisateur modifié avec succès.',
-            'user' => $user, // Les données de l'utilisateur mis à jour
         ];
         
-        return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
+        return $this->json($responseData, Response::HTTP_OK, []);
     }
 
     /**
