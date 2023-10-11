@@ -18,108 +18,180 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RoundController extends AbstractController
 {
+  // /**
+  // * @Route("/api/round/new", name="api_id_create_round", methods={"POST"})
+  // */
+  // public function createRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+  // {
+  //   $jsonContent = $request->getContent();
+  //   $roundData = json_decode($jsonContent, true);
+
+  //   if ($roundData === null) {
+  //     return $this->json(['error' => 'Données JSON invalides'], Response::HTTP_BAD_REQUEST);
+  //   }
+
+  //   // Vérifiez si "season" existe dans les données JSON
+  //   if (!isset($roundData['season'])) {
+  //     return $this->json(['error' => 'La clé "season" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+  //   }
+
+  //   // Vérifiez si "year" existe dans les données JSON
+  //   if (!isset($roundData['season']['year'])) {
+  //     return $this->json(['error' => 'La clé "year" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+  //   }
+
+  //   // Autres vérifications pour s'assurer que d'autres données requises existent
+  //   if (!isset($roundData['user_id'])) {
+  //     return $this->json(['error' => 'La clé "user_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+  //   }
+
+  //   if (!isset($roundData['league_id'])) {
+  //     return $this->json(['error' => 'La clé "league_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
+  //   }
+
+  //   // Désérialisez les données JSON dans une nouvelle entité Round
+  //   $round = $serializer->deserialize($jsonContent, Round::class, 'json');
+
+  //   // Récupérez l'ID de la saison depuis les données JSON
+  //   $seasonId = $roundData['season']['id'];
+
+  //   // Chargez l'entité Season (Saison) correspondante depuis la base de données en utilisant l'identifiant
+  //   $season = $entityManager->getRepository(Season::class)->find($seasonId);
+
+  //   if (!$season) {
+  //     return $this->json(['error' => 'Saison introuvable'], Response::HTTP_NOT_FOUND);
+  //   }
+
+  //   // // Récupérez l'année depuis les données JSON et associez-la à la saison (Season)
+  //   // $year = $roundData['season']['year'];
+  //   // $season->setYear($year);
+
+  //   // Associez la saison au tour (Round)
+  //   $round->setSeason($season);
+
+  //   // Associez la ligue au tour en utilisant league_id depuis les données JSON
+  //   $leagueId = $roundData['league_id'];
+  //   $league = $entityManager->getRepository(League::class)->find($leagueId);
+
+  //   if (!$league) {
+  //     return $this->json(['error' => 'Ligue introuvable'], Response::HTTP_NOT_FOUND);
+  //   }
+
+  //   $round->setLeague($league);
+
+  //   // Associez l'utilisateur (User) au tour en utilisant user_id depuis les données JSON
+  //   $userId = $roundData['user_id'];
+  //   $user = $entityManager->getRepository(User::class)->find($userId);
+
+  //   if (!$user) {
+  //     return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_NOT_FOUND);
+  //   }
+
+  //   $round->setUser($user);
+
+  //   // Ajoutez d'autres propriétés au tour (Round) si nécessaire
+  //   $round->setCategory('saison_Reguliere');
+  //   $round->setCreatedAt(new \DateTime('now'));
+
+  //   // Validez l'entité Round
+  //   $errors = $validator->validate($round);
+
+  //   if (count($errors) > 0) {
+  //     $errorMessages = [];
+
+  //     foreach ($errors as $error) {
+  //       $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+  //     }
+      
+  //     return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+  //   }
+
+  //   // Persistez et flush (enregistrez) le tour dans la base de données
+  //   $entityManager->persist($round);
+  //   $entityManager->flush();
+
+  //   return $this->json(
+  //   $round,
+  //   Response::HTTP_CREATED,
+  //   [
+  //   'Location' => $this->generateUrl('api_id_create_round', ['id' => $round->getId()]),
+  //   ],
+  //   ['groups' => ['rounds_get_collection']]
+  //   );
+  // }
+
   /**
-  * @Route("/api/round/new", name="api_id_create_round", methods={"POST"})
+   * Create Round
+   * 
+  * @Route("/api/round/new", name="app_api_round_post", methods={"POST"})
   */
-  public function createRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
-  {
-    $jsonContent = $request->getContent();
-    $roundData = json_decode($jsonContent, true);
+  public function postRound(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    {
+        $jsonContent = $request->getContent();
+        $roundData = json_decode($jsonContent, true);
 
-    if ($roundData === null) {
-      return $this->json(['error' => 'Données JSON invalides'], Response::HTTP_BAD_REQUEST);
-    }
+        $round = $serializer->deserialize($jsonContent, Round::class,'json');
 
-    // Vérifiez si "season" existe dans les données JSON
-    if (!isset($roundData['season'])) {
-      return $this->json(['error' => 'La clé "season" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
-    }
+        // Vérifiez si le champ "season" existe et si oui, associez le round à une saison
+        if (isset($roundData['season'])) {
+            $seasonId = $roundData['season'];
+            $season = $entityManager->getRepository(Season::class)->find($seasonId);
+            if (!$season) {
+                return $this->json(['error' => 'Saison non trouvée.'], Response::HTTP_NOT_FOUND);
+            }
+            $round->setSeason($season);
+        } else {
+          return $this->json(['error' => 'Le champ "season" est requis.'], Response::HTTP_BAD_REQUEST);
+      }
 
-    // Vérifiez si "year" existe dans les données JSON
-    if (!isset($roundData['season']['year'])) {
-      return $this->json(['error' => 'La clé "year" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
-    }
-
-    // Autres vérifications pour s'assurer que d'autres données requises existent
-    if (!isset($roundData['user_id'])) {
-      return $this->json(['error' => 'La clé "user_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
-    }
-
-    if (!isset($roundData['league_id'])) {
-      return $this->json(['error' => 'La clé "league_id" est manquante dans les données JSON'], Response::HTTP_BAD_REQUEST);
-    }
-
-    // Désérialisez les données JSON dans une nouvelle entité Round
-    $round = $serializer->deserialize($jsonContent, Round::class, 'json');
-
-    // Récupérez l'ID de la saison depuis les données JSON
-    $seasonId = $roundData['season']['id'];
-
-    // Chargez l'entité Season (Saison) correspondante depuis la base de données en utilisant l'identifiant
-    $season = $entityManager->getRepository(Season::class)->find($seasonId);
-
-    if (!$season) {
-      return $this->json(['error' => 'Saison introuvable'], Response::HTTP_NOT_FOUND);
-    }
-
-    // // Récupérez l'année depuis les données JSON et associez-la à la saison (Season)
-    // $year = $roundData['season']['year'];
-    // $season->setYear($year);
-
-    // Associez la saison au tour (Round)
-    $round->setSeason($season);
-
-    // Associez la ligue au tour en utilisant league_id depuis les données JSON
-    $leagueId = $roundData['league_id'];
-    $league = $entityManager->getRepository(League::class)->find($leagueId);
-
-    if (!$league) {
-      return $this->json(['error' => 'Ligue introuvable'], Response::HTTP_NOT_FOUND);
-    }
-
-    $round->setLeague($league);
-
-    // Associez l'utilisateur (User) au tour en utilisant user_id depuis les données JSON
-    $userId = $roundData['user_id'];
-    $user = $entityManager->getRepository(User::class)->find($userId);
-
-    if (!$user) {
-      return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_NOT_FOUND);
-    }
-
-    $round->setUser($user);
-
-    // Ajoutez d'autres propriétés au tour (Round) si nécessaire
-    $round->setCategory('saison_Reguliere');
-    $round->setCreatedAt(new \DateTime('now'));
-
-    // Validez l'entité Round
-    $errors = $validator->validate($round);
-
-    if (count($errors) > 0) {
-      $errorMessages = [];
-
-      foreach ($errors as $error) {
-        $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+        // Vérifiez si le champ "league" existe et si oui, associez le round à une league
+        if (isset($roundData['league'])) {
+          $leagueId = $roundData['league'];
+          $league = $entityManager->getRepository(League::class)->find($leagueId);
+          if (!$league) {
+              return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
+          }
+          $round->setleague($league);
       }
       
-      return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        // Vérifiez si le champ "user" existe et si oui, associez le round à un utilisateur
+        if (isset($roundData['user'])) {
+          $userId = $roundData['user'];
+          $user = $entityManager->getRepository(User::class)->find($userId);
+          if (!$user) {
+              return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
+          }
+          $round->setuser($user);
+      }
+
+        $round->setCreatedAt(new \DateTime('now'));
+
+        $errors = $validator->validate($round);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $entityManager->persist($round);
+        $entityManager->flush();
+
+        return $this->json(
+            $round,
+            Response::HTTP_CREATED,
+            [
+                // 'Location' => $this->generateUrl('app_api_round', ['id' => $round->getId()]),
+            ],
+            ['groups' => ['rounds_get_collection']]
+        );
     }
 
-    // Persistez et flush (enregistrez) le tour dans la base de données
-    $entityManager->persist($round);
-    $entityManager->flush();
-
-    return $this->json(
-    $round,
-    Response::HTTP_CREATED,
-    [
-    'Location' => $this->generateUrl('api_id_create_round', ['id' => $round->getId()]),
-    ],
-    ['groups' => ['rounds_get_collection']]
-    );
-  }
-
+  
   /**
   * Updated Round
   *
