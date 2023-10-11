@@ -62,9 +62,9 @@ class RoundController extends AbstractController
       return $this->json(['error' => 'Saison introuvable'], Response::HTTP_NOT_FOUND);
     }
 
-    // Récupérez l'année depuis les données JSON et associez-la à la saison (Season)
-    $year = $roundData['season']['year'];
-    $season->setYear($year);
+    // // Récupérez l'année depuis les données JSON et associez-la à la saison (Season)
+    // $year = $roundData['season']['year'];
+    // $season->setYear($year);
 
     // Associez la saison au tour (Round)
     $round->setSeason($season);

@@ -272,6 +272,12 @@ class UserController extends AbstractController
         if (isset($data['score'])) {
             $user->setScore($data['score']);
         }
+        if (isset($data['position'])) {
+            $user->setPosition($data['position']);
+        }
+        if (isset($data['oldposition'])) {
+            $user->setOldPosition($data['oldposition']);
+        }
 
         // Mise à jour de la relation "league" (ajout d'une vérification isset)
         if (isset($data['league'])) {
