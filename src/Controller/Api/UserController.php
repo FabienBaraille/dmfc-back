@@ -6,6 +6,7 @@ use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\League;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
@@ -88,19 +89,23 @@ class UserController extends AbstractController
 
         $user = $serializer->deserialize($jsonContent, User::class, 'json');
 
-        // Vérifiez si le champ "league" existe et si oui, associez l'utilisateur à une ligue
-        if (isset($userData['league'])) {
-            $leagueId = $userData['league'];
-            $league = $entityManager->getRepository(League::class)->find($leagueId);
-            if (!$league) {
-                return $this->json(['error' => 'Ligue non trouvée.'], Response::HTTP_NOT_FOUND);
-            }
-            $user->setLeague($league);
-        }    
-
         // Hasher le mot de passe avant la sauvegarde
         $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
         $user->setPassword($hashedPassword);
+
+        // Récupérer les rôles du formulaire
+        $roles = $userData['roles'] ?? [];
+
+        // Réinitialisez complètement les rôles de l'utilisateur
+        $user->setRoles([]);
+
+        // Vérifiez si ROLE_DMFC a été coché et l'ajoutez si nécessaire
+        if (in_array("ROLE_DMFC", $roles)) {
+            $user->setRoles(["ROLE_DMFC"]);
+        } else {
+            $user->setRoles(["ROLE_JOUEURNA"]); // Définissez ROLE_JOUEURNA par défaut
+        }
+
 
         $user->setCreatedAt(new \DateTime('now'));
 
@@ -121,7 +126,6 @@ class UserController extends AbstractController
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
             'message' => 'Utilisateur créer avec succès.',
-            'user' => $user, // Les données de l'utilisateur mis à jour
         ];
 
             return $this->json(
@@ -130,7 +134,6 @@ class UserController extends AbstractController
                 [
                     'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
                 ],
-                ['groups' => ['user_get_item']]
             );
     }
 
@@ -201,8 +204,9 @@ class UserController extends AbstractController
 
             // Associez l'utilisateur à la nouvelle équipe
             $user->setTeam($newTeam);
-        }   
+        }
 
+        
         // Vérifiez l'unicité du username et de l'email avant la validation
         $existingUserWithUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $userData['username']]);
         $existingUserWithEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
@@ -243,16 +247,15 @@ class UserController extends AbstractController
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
             'message' => 'Utilisateur modifié avec succès.',
-            'user' => $user, // Les données de l'utilisateur mis à jour
         ];
         
-        return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
+        return $this->json($responseData, Response::HTTP_OK, []);
     }
 
-   /**
-     * @Route("/api/users/{id}", name="update_user_dmfc_id", methods={"PUT"})
+    /**
+     * @Route("/api/user/{id}/dmfc", name="app_api_update_user_by_dmfc", methods={"PUT"})
      */
-    public function updateUserByDmfc(Request $request, User $user, ValidatorInterface $validator)
+    public function updateUserByDmfc(Request $request, User $user, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
         // Récupérez les données JSON de la requête
         $data = json_decode($request->getContent(), true);
@@ -264,24 +267,26 @@ class UserController extends AbstractController
         if (isset($data['role'])) {
             $user->setRoles($data['role']);
         }
-
-        // Gérez le champ "team" correctement
-        if (isset($data['team'])) {
-            // Vous devez vérifier si $data['team'] est null ou une référence à une entité Team
-            if ($data['team'] === null) {
-                $user->setTeam(null); // Aucune équipe
-            } else {
-                // Vous devez récupérer l'entité Team correspondante en fonction de l'ID par exemple
-                // Assurez-vous d'ajuster cela en fonction de votre logique d'application
-                $team = $this->getDoctrine()->getRepository(Team::class)->find($data['team']);
-                if ($team) {
-                    $user->setTeam($team);
-                } else {
-                    return new JsonResponse(['errors' => ['team' => 'Équipe non trouvée']], 400);
-                }
-            }
+        if (isset($data['score'])) {
+            $user->setScore($data['score']);
         }
 
+        // Mise à jour de la relation "league"
+        if (isset($data['league'])) {
+            // Récupérez l'ID de la nouvelle ligue
+            $newLeagueId = $data['league'];
+
+            // Récupérez la ligue depuis la base de données
+            $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
+
+            if (!$newLeague) {
+                return $this->json(['error' => "Cette ligue n'existe pas."], Response::HTTP_NOT_FOUND);
+            }
+
+            // Associez l'utilisateur à la nouvelle ligue
+            $user->setLeague($newLeague);
+        }
+        
         // Validez les données mises à jour avec le groupe de validation
         $violations = $validator->validate($user, null, ['update_dmfc']);
 
@@ -303,10 +308,11 @@ class UserController extends AbstractController
         // Créez une réponse JSON pour indiquer que la mise à jour a réussi
         $response = [
             'message' => 'Mise à jour réussie',
-            'user_id' => $user->getId(),
-            'title' => $user->getTitle(),
-            'role' => $user->getRoles(),
-            'team' => $user->getTeam() ? $user->getTeam()->getId() : null, // Vous pouvez renvoyer l'ID de l'équipe
+            // 'user_id' => $user->getId(),
+            // 'title' => $user->getTitle(),
+            // 'role' => $user->getRoles(),
+            // 'score' => $user->getScore(),
+            // 'league' => $user->getLeague(),
         ];
 
         return new JsonResponse($response);
