@@ -16,22 +16,25 @@
 <body>
     
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ path('app_back_home') }}">
-                <img src="{{ asset('images/logo_dmfc.png') }}" alt="Logo DMFC" height="60">
-                Back Office DMFC
-            </a>        
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ path('app_back_home') }}">Accueil</a>
-                    </li>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ path('app_back_home') }}">
+            <img src="{{ asset('images/logo_dmfc.png') }}" alt="Logo DMFC" height="60">
+            Back Office DMFC
+        </a>        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ path('app_back_home') }}">Accueil</a>
+                </li>
+
+                {% if is_granted('ROLE_ADMIN') %}    
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_back_user') }}">Utilisateurs</a>
                     </li>
@@ -41,16 +44,33 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_back_season') }}">Saisons</a>
                     </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Retour sur le site</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+                {% endif %}
+            </ul>
 
+            {# user block #}
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                {# user connecté #}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-bs-toggle="dropdown">
+                        <span>{{ app.user.username }}</span>
+                        <i class="bi bi-person-square"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ path('app_auth_logout') }}">Déconnexion</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                {# anonymous #}
+                <li class="nav-item">
+                    <a class="btn btn-danger" href="{{ path('app_auth_login') }}">Connexion</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
     <!-- Contenu de la page -->
     <div class="container mt-3">
         {% block body %}
