@@ -195,7 +195,6 @@ class UserController extends AbstractController
             $user->setEmail($userData['email']);
         }
 
-
         // Mise à jour de la relation "league"
         if (isset($userData['league'])) {
             // Récupérez l'ID de la nouvelle ligue
@@ -212,24 +211,23 @@ class UserController extends AbstractController
             $user->setLeague($newLeague);
         }
 
-        // Mise à jour de la relation "league"
-        if (isset($userData['league'])) {
-            // Récupérez l'ID de la nouvelle ligue
-            $newLeagueId = $userData['league'];
+        // Mise à jour de la relation "team"
+        if (isset($userData['team'])) {
+            // Récupérez l'ID de la nouvelle équipe
+            $newTeamId = $userData['team'];
 
-            // Récupérez la ligue depuis la base de données
-            $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
+            // Récupérez l'équipe depuis la base de données
+            $newTeam = $entityManager->getRepository(Team::class)->find($newTeamId);
 
-            if (!$newLeague) {
-                return $this->json(['error' => "Cette ligue n'existe pas !"], Response::HTTP_NOT_FOUND);
+            if (!$newTeam) {
+                return $this->json(['error' => "Cette équipe n'existe pas."], Response::HTTP_NOT_FOUND);
             }
 
-            // Associez l'utilisateur à la nouvelle ligue
-            $user->setLeague($newLeague);
-        }     
+            // Associez l'utilisateur à la nouvelle équipe
+            $user->setTeam($newTeam);
+        }
 
-        // Vérifiez l'unicité du username et de l'email avant la validation
-               
+    
 
         // Validez les modifications apportées à l'utilisateur
         $errors = $validator->validate($user);
