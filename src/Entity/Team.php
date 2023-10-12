@@ -51,17 +51,6 @@ class Team
      */
     private $logo;
 
-    /**     * @ORM\Column(type="string", length=3)
-
-     * @ORM\Column(type="smallint", nullable=true)
-     */
-    private $nbSelectedHome;
-
-    /**
-     * @ORM\Column(type="smallint", nullable=true)
-     */
-    private $nbSelectedAway;
-
     /**
      * @ORM\Column(type="smallint", nullable=true)
      */
@@ -144,30 +133,6 @@ class Team
     public function setLogo(?string $logo): self
     {
         $this->logo = $logo;
-
-        return $this;
-    }
-
-    public function getNbSelectedHome(): ?int
-    {
-        return $this->nbSelectedHome;
-    }
-
-    public function setNbSelectedHome(?int $nbSelectedHome): self
-    {
-        $this->nbSelectedHome = $nbSelectedHome;
-
-        return $this;
-    }
-
-    public function getNbSelectedAway(): ?int
-    {
-        return $this->nbSelectedAway;
-    }
-
-    public function setNbSelectedAway(?int $nbSelectedAway): self
-    {
-        $this->nbSelectedAway = $nbSelectedAway;
 
         return $this;
     }
@@ -264,6 +229,4 @@ class Team
 
         return $this;
     }
-
-
 }

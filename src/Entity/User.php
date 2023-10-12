@@ -77,12 +77,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection"})
-     */
-    private $position;
-
-    /**
-     * @ORM\Column(type="smallint", nullable=true)
      * @Groups({"user_get_item"})
      */
     private $seasonPlayed;
@@ -242,18 +236,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setOldPosition(?int $oldPosition): self
     {
         $this->oldPosition = $oldPosition;
-
-        return $this;
-    }
-
-    public function getPosition(): ?int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(?int $position): self
-    {
-        $this->position = $position;
 
         return $this;
     }
