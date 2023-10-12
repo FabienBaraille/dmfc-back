@@ -154,7 +154,7 @@ class UserController extends AbstractController
           return $this->json(['message' => 'Utilisateur supprimé avec succès.'], Response::HTTP_OK);
       }
 
-    /**
+     /**
      * Update User by Id
      *
      * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
@@ -174,6 +174,10 @@ class UserController extends AbstractController
 
         // Mise à jour des champs de l'utilisateur
         if (isset($userData['username'])) {
+            $existingUserWithUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $userData['username']]);
+            if (($existingUserWithUsername && $existingUserWithUsername !== $user)) {
+                return $this->json(['error' => 'Le nom d\'utilisateur est déjà utilisé.'], Response::HTTP_BAD_REQUEST);
+            }
             $user->setUsername($userData['username']);
         }
 
@@ -184,38 +188,48 @@ class UserController extends AbstractController
         }
 
         if (isset($userData['email'])) {
+            $existingUserWithEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
+            if ($existingUserWithEmail && $existingUserWithEmail !== $user) {
+                return $this->json(['error' => 'L\'adresse email est déjà utilisée.'], Response::HTTP_BAD_REQUEST);
+            }
             $user->setEmail($userData['email']);
         }
 
 
-        // Mise à jour de la relation "team"
-        if (isset($userData['team'])) {
-            // Récupérez l'ID de la nouvelle équipe
-            $newTeamId = $userData['team'];
+        // Mise à jour de la relation "league"
+        if (isset($userData['league'])) {
+            // Récupérez l'ID de la nouvelle ligue
+            $newLeagueId = $userData['league'];
 
-            // Récupérez l'équipe depuis la base de données
-            $newTeam = $entityManager->getRepository(Team::class)->find($newTeamId);
+            // Récupérez la ligue depuis la base de données
+            $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
 
-            if (!$newTeam) {
+            if (!$newLeague) {
                 return $this->json(['error' => "Cette équipe n'existe pas."], Response::HTTP_NOT_FOUND);
             }
 
-            // Associez l'utilisateur à la nouvelle équipe
-            $user->setTeam($newTeam);
+            // Associez l'utilisateur à la nouvelle ligue
+            $user->setLeague($newLeague);
         }
 
-        
+        // Mise à jour de la relation "league"
+        if (isset($userData['league'])) {
+            // Récupérez l'ID de la nouvelle ligue
+            $newLeagueId = $userData['league'];
+
+            // Récupérez la ligue depuis la base de données
+            $newLeague = $entityManager->getRepository(League::class)->find($newLeagueId);
+
+            if (!$newLeague) {
+                return $this->json(['error' => "Cette ligue n'existe pas !"], Response::HTTP_NOT_FOUND);
+            }
+
+            // Associez l'utilisateur à la nouvelle ligue
+            $user->setLeague($newLeague);
+        }     
+
         // Vérifiez l'unicité du username et de l'email avant la validation
-        $existingUserWithUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $userData['username']]);
-        $existingUserWithEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
-
-        if (($existingUserWithUsername && $existingUserWithUsername !== $user)) {
-            return $this->json(['error' => 'Le nom d\'utilisateur est déjà utilisé.'], Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($existingUserWithEmail && $existingUserWithEmail !== $user) {
-            return $this->json(['error' => 'L\'adresse email est déjà utilisée.'], Response::HTTP_BAD_REQUEST);
-        }       
+               
 
         // Validez les modifications apportées à l'utilisateur
         $errors = $validator->validate($user);
@@ -245,10 +259,12 @@ class UserController extends AbstractController
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
             'message' => 'Utilisateur modifié avec succès.',
+            'user' => $user, // Les données de l'utilisateur mis à jour
         ];
         
-        return $this->json($responseData, Response::HTTP_OK, []);
+        return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
     }
+
 
     /**
      * @Route("/api/user/{id}/dmfc", name="app_api_update_user_by_dmfc", methods={"PUT"})
@@ -271,6 +287,10 @@ class UserController extends AbstractController
 
         if (isset($data['score'])) {
             $user->setScore($data['score']);
+        }
+        
+        if (isset($data['oldPosition'])) {
+            $user->setOldPosition($data['oldPosition']);
         }
 
         // Mise à jour de la relation "league" (ajout d'une vérification isset)

@@ -8,6 +8,7 @@ use App\Entity\Round;
 use App\Repository\GameRepository;
 use App\Repository\TeamRepository;
 use App\Repository\RoundRepository;
+use App\Repository\SrpredictionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,7 +75,28 @@ class GameController extends AbstractController
         );
     }
 
-
+    /**
+     * GET predictions by game ID
+     *
+     * @Route("/api/game/{id}/srprediction", name="app_api_srprediction_by_game_id", methods={"GET"})
+     */
+    public function getSrpredictionsByGameId(SrpredictionRepository $predictionRepository, $id): JsonResponse
+    {
+        // Recherchez le jeu par son ID
+        $game = $this->getDoctrine()->getRepository(Game::class)->find($id);
+        if (!$game) {
+            return $this->json(['error' => 'Game not found'], 404);
+        }
+        // Récupérez toutes les prédictions associées à ce jeu
+        $predictions = $predictionRepository->findBy(['Game' => $game]);
+        // Vous pouvez renvoyer les prédictions sous forme de réponse JSON
+        return $this->json(
+            $predictions,
+            200,
+            [],
+            ['groups' => 'prediction']
+        );
+    }
     /**
      * Create Game
      * 
@@ -166,19 +188,15 @@ class GameController extends AbstractController
     public function updateGame(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, $id): JsonResponse
     {
         $game = $entityManager->getRepository(Game::class)->find($id);
-
         // Vérifiez si le jeu existe
         if ($game === null) {
             // Réponse avec un statut 404 si le jeu n'est pas trouvé
             return $this->json(['message' => 'Le jeu demandé n\'existe pas.'], Response::HTTP_NOT_FOUND);
         }
-
         $jsonContent = $request->getContent();
         $gameData = json_decode($jsonContent, true);
-
         $serializer = $this->get('serializer');
         $updatedGame = $serializer->deserialize($jsonContent, Game::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $game]);
-
         // Vérifiez si le champ "round" existe et si oui, mettez à jour le jeu avec le nouveau round
         if (isset($gameData['round'])) {
             $roundId = $gameData['round'];
@@ -188,7 +206,6 @@ class GameController extends AbstractController
             }
             $updatedGame->setRound($round);
         }
-
         // Vérifiez si le champ "teams" existe et si oui, mettez à jour le jeu avec les nouvelles équipes
         if (isset($gameData['teams'])) {
             $teamIds = $gameData['teams'];
@@ -201,23 +218,31 @@ class GameController extends AbstractController
                 $updatedGame->addTeam($team);
             }
         }
-
+        // Vérifiez si le champ "homeOdd" existe et si oui, mettez à jour la cote à domicile
+        if (isset($gameData['homeOdd'])) {
+            $updatedGame->setHomeOdd($gameData['homeOdd']);
+        }
+        // Vérifiez si le champ "visitorOdd" existe et si oui, mettez à jour la cote visiteur
+        if (isset($gameData['visitorOdd'])) {
+            $updatedGame->setVisitorOdd($gameData['visitorOdd']);
+        }
+        // Calculez le gagnant en fonction des scores
+        $visitorScore = $updatedGame->getVisitorScore();
+        $homeScore = $updatedGame->getHomeScore();
+        if (isset($gameData['winner'])) {
+            $newWinner = $gameData['winner'];
+            $game->setWinner($newWinner);
+        }
         $updatedGame->setUpdatedAt(new \DateTime('now'));
-
         $errors = $validator->validate($updatedGame);
-
         if (count($errors) > 0) {
             $errorMessages = [];
-
             foreach ($errors as $error) {
                 $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
             }
-
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
         $entityManager->flush();
-
         return $this->json(
             ['message' => 'La modification a été effectuée avec succès.', 'game' => $updatedGame],
             Response::HTTP_OK,
