@@ -22,7 +22,7 @@ class Season
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"rounds_get_collection","Seasons_get_collection"})
+     * @Groups({"rounds_get_collection","seasons_get_collection"})
      */
     private $id;
 
@@ -50,7 +50,7 @@ class Season
 
     /**
      * @ORM\OneToMany(targetEntity=Round::class, mappedBy="season", orphanRemoval=true)
-     * @Groups({"Seasons_get_collection"})
+     * @Groups({"seasons_get_collection"})
      */
     private $rounds;
 
