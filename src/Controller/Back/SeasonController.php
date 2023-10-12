@@ -32,6 +32,7 @@ class SeasonController extends AbstractController
         'season' => $season,
         ]);
     }
+    
     /**
      * @Route("/back/new/season", name="app_back_season_new", methods={"GET", "POST"})
      */
