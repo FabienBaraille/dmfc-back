@@ -56,16 +56,19 @@ class Season
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"seasons_get_collection"})
      */
     private $startSeason;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"seasons_get_collection"})
      */
     private $startPlayoff;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups({"seasons_get_collection"})
      */
     private $Comment;
 
