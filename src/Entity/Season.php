@@ -54,6 +54,21 @@ class Season
      */
     private $rounds;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $startSeason;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $startPlayoff;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $Comment;
+
     public function __construct()
     {
         $this->leaderboards = new ArrayCollection();
@@ -157,6 +172,42 @@ class Season
                 $round->setSeason(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStartSeason(): ?\DateTimeInterface
+    {
+        return $this->startSeason;
+    }
+
+    public function setStartSeason(?\DateTimeInterface $startSeason): self
+    {
+        $this->startSeason = $startSeason;
+
+        return $this;
+    }
+
+    public function getStartPlayoff(): ?\DateTimeInterface
+    {
+        return $this->startPlayoff;
+    }
+
+    public function setStartPlayoff(?\DateTimeInterface $startPlayoff): self
+    {
+        $this->startPlayoff = $startPlayoff;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->Comment;
+    }
+
+    public function setComment(?string $Comment): self
+    {
+        $this->Comment = $Comment;
 
         return $this;
     }
