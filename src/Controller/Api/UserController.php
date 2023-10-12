@@ -154,7 +154,7 @@ class UserController extends AbstractController
           return $this->json(['message' => 'Utilisateur supprimé avec succès.'], Response::HTTP_OK);
       }
 
-    /**
+     /**
      * Update User by Id
      *
      * @Route("/api/user/{id}", name="app_api_user_update", methods={"PUT"})
@@ -174,13 +174,10 @@ class UserController extends AbstractController
 
         // Mise à jour des champs de l'utilisateur
         if (isset($userData['username'])) {
-
             $existingUserWithUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $userData['username']]);
             if (($existingUserWithUsername && $existingUserWithUsername !== $user)) {
                 return $this->json(['error' => 'Le nom d\'utilisateur est déjà utilisé.'], Response::HTTP_BAD_REQUEST);
             }
-    
-
             $user->setUsername($userData['username']);
         }
 
@@ -191,13 +188,10 @@ class UserController extends AbstractController
         }
 
         if (isset($userData['email'])) {
-
             $existingUserWithEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $userData['email']]);
             if ($existingUserWithEmail && $existingUserWithEmail !== $user) {
                 return $this->json(['error' => 'L\'adresse email est déjà utilisée.'], Response::HTTP_BAD_REQUEST);
-            }       
-    
-
+            }
             $user->setEmail($userData['email']);
         }
 
@@ -263,10 +257,12 @@ class UserController extends AbstractController
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
             'message' => 'Utilisateur modifié avec succès.',
+            'user' => $user, // Les données de l'utilisateur mis à jour
         ];
         
-        return $this->json($responseData, Response::HTTP_OK, []);
+        return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
     }
+
 
     /**
      * @Route("/api/user/{id}/dmfc", name="app_api_update_user_by_dmfc", methods={"PUT"})
@@ -290,11 +286,9 @@ class UserController extends AbstractController
         if (isset($data['score'])) {
             $user->setScore($data['score']);
         }
-        if (isset($data['position'])) {
-            $user->setPosition($data['position']);
-        }
-        if (isset($data['oldposition'])) {
-            $user->setOldPosition($data['oldposition']);
+        
+        if (isset($data['oldPosition'])) {
+            $user->setOldPosition($data['oldPosition']);
         }
 
         // Mise à jour de la relation "league" (ajout d'une vérification isset)

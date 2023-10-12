@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SrpredictionController extends AbstractController
@@ -32,24 +33,24 @@ class SrpredictionController extends AbstractController
     */
     public function getSrpredictionsByUserId(UserRepository $userRepository, SrpredictionRepository $predictionRepository, $id): JsonResponse
     {
-    // Recherchez l'utilisateur par ID
-    $user = $userRepository->find($id);
+        // Recherchez l'utilisateur par ID
+        $user = $userRepository->find($id);
 
-    if (!$user) {
-        return $this->json(['error' => 'User not found'], 404);
+        if (!$user) {
+            return $this->json(['error' => 'User not found'], 404);
+        }
+
+        // Récupérez toutes les prédictions associées à l'utilisateur
+        $predictions = $predictionRepository->findBy(['User' => $user]);
+
+        // Vous pouvez renvoyer les prédictions sous forme de réponse JSON
+        return $this->json(
+            $predictions,
+            200,
+            [],
+            ['groups' => 'prediction']
+        );
     }
-
-    // Récupérez toutes les prédictions associées à l'utilisateur
-    $predictions = $predictionRepository->findBy(['User' => $user]);
-
-    // Vous pouvez renvoyer les prédictions sous forme de réponse JSON
-    return $this->json(
-        $predictions,
-        200,
-        [],
-        ['groups' => 'prediction']
-    );
-}
     /**
      * POST prediction by user
      *
@@ -151,6 +152,50 @@ class SrpredictionController extends AbstractController
         $entityManager->flush();
         $jsonData = $serializer->serialize($srprediction, 'json', ['groups' => 'prediction']);
         return new JsonResponse(['message' => 'Votre pronostic a été mis à jour avec succès', 'prediction' => json_decode($jsonData)]);
+    }
+    /**
+     * @Route("/api/prediction/{id}/dmfc", name="app_api_update_prediction_by_dmfc", methods={"PUT"})
+     */
+    public function updatePredictionByDmfc(Request $request, Srprediction $srprediction, ValidatorInterface $validator)
+    {
+        // Récupérez les données JSON de la requête
+        $data = json_decode($request->getContent(), true);
+
+        // Mettez à jour les propriétés de la prediction
+        if (isset($data['pointScored'])) {
+            $srprediction->setPointScored($data['pointScored']);
+        }
+        if (isset($data['bonusPointsErned'])) {
+            $srprediction->setBonusPointsErned($data['bonusPointsErned']);
+        }
+        if (isset($data['bonusBookie'])) {
+            $srprediction->setBonusBookie($data['bonusBookie']);
+        }
+        
+        // Validez les données mises à jour avec le groupe de validation
+        $violations = $validator->validate($srprediction, null, ['update_dmfc']);
+
+        if (count($violations) > 0) {
+            // Gérez les erreurs de validation, par exemple, renvoyez une réponse JSON d'erreur
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[$violation->getPropertyPath()] = $violation->getMessage();
+            }
+
+            return new JsonResponse(['errors' => $errors], 400);
+        }
+
+        // Sauvegardez les modifications dans la base de données
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($srprediction);
+        $entityManager->flush();
+
+        // Créez une réponse JSON pour indiquer que la mise à jour a réussi
+        $response = [
+            'message' => 'Mise à jour réussie',
+        ];
+
+        return new JsonResponse($response);
     }
 }
 
