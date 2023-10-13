@@ -10,7 +10,7 @@ security:
                 class: App\Entity\User
                 property: username
     firewalls:
-    
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -37,15 +37,32 @@ security:
             stateless: true
             jwt: ~
 
+        main:
+            lazy: true
+            provider: app_user_provider
+        
+            form_login:
+                # "app_auth_login" is the name of the route created previously
+                login_path: app_auth_login
+                check_path: app_auth_login
+                default_target_path: app_back_home
+
+            # logout
+            logout:
+                # chemin ou nom de route
+                path: app_auth_logout
+                target: app_back_home
+
+
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
          # API
-         - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
-         - { path: ^/api/users/id, roles: ROLE_DMFC, methods: UPDATE }
-         - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
-         - { path: ^/api/user, roles: ROLE_JOUEUR, methods: UPDATE }
+         - { path: ^/api/user/id/dmfc, roles: ROLE_DMFC, methods: UPDATE }
          - { path: ^/api/users, roles: ROLE_ADMIN }
+         - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
+         - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/user/id, roles: ROLE_JOUEUR, methods: UPDATE }
          - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/leagues, roles: PUBLIC_ACCESS }
          - { path: ^/api/league, roles: ROLE_JOUEUR }
@@ -61,8 +78,15 @@ security:
          - { path: ^/api/round/new, roles: ROLE_DMFC }
          - { path: ^/api/round, roles: ROLE_DMFC, methods: UPDATE }
          - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
-         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+         - { path: ^/api/seasons, roles: ROLE_JOUEUR }
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+         # Back
+         - { path: ^/back/logout, roles: PUBLIC_ACCESS }
+         - { path: ^/back/login, roles: PUBLIC_ACCESS }
+         - { path: ^/back/home, roles: PUBLIC_ACCESS }
+         - { path: ^/back, roles: ROLE_ADMIN }
+
 
     role_hierarchy:
         ROLE_ADMIN:     ROLE_DMFC
@@ -80,3 +104,4 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+                

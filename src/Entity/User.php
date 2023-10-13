@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","rounds_get_collection","leaderbord"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","rounds_get_collection","leaderbord","prediction"})
      */
     private $id;
 
@@ -65,21 +65,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"user_get_item", "leagues_get_collection"})
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
      */
     private $score;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"league_get_collection"})
+     * @Groups({"user_get_collection", "leagues_get_collection"})
       */
     private $oldPosition;
-
-    /**
-     * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection"})
-     */
-    private $position;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
@@ -113,7 +107,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Team::class, inversedBy="users")
-     * @Groups({"user_get_item", "leagues_get_users","update_dmfc"})
+     * @Groups({"user_get_collection","user_get_item", "leagues_get_collection", "leagues_get_users","update_dmfc"})
      */
     private $team;
 
@@ -242,18 +236,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setOldPosition(?int $oldPosition): self
     {
         $this->oldPosition = $oldPosition;
-
-        return $this;
-    }
-
-    public function getPosition(): ?int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(?int $position): self
-    {
-        $this->position = $position;
 
         return $this;
     }
@@ -414,7 +396,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-    return (string) $this->username;
+        return (string) $this->username;
     }
 
     /**

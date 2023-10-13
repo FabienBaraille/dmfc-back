@@ -10,7 +10,7 @@ class mainController extends AbstractController
 {
     /**
      * Homepage back
-     * @Route("/back", name="app_back_home")
+     * @Route("/back/home", name="app_back_home")
      */
     public function home(): Response
     {

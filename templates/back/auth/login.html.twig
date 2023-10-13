@@ -1,0 +1,36 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="d-flex justify-content-center align-items-center my-5">
+    <div class="position-relative">
+        <div class="rounded-lg p-5 bg-secondary shadow-lg" style="border-radius: 20px;">
+            
+            {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            <form action="{{ path('app_auth_login') }}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label text-white">Pseudo:</label>
+                    <input type="text" id="username" name="_username" value="{{ last_username }}"
+                        class="form-control text-black">
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label text-white">Mot de passe:</label>
+                    <input type="password" id="password" name="_password" class="form-control text-black">
+                </div>
+
+                {# If you want to control the URL the user is redirected to on success
+                <input type="hidden" name="_target_path" value="/account"> #}
+
+                <button type="submit" class="btn btn-danger">Login</button>
+            </form>
+            <div class="position-absolute top-0 end-0 mt-3 me-3">
+                <span class="header-logo__title">DMFC</span>
+                <img src="{{ asset('images/logo_dmfc.png') }}" height="32" alt="Logo DMFC">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

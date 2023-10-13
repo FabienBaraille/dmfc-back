@@ -22,13 +22,13 @@ class Season
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"rounds_get_collection","Seasons_get_collection"})
+     * @Groups({"rounds_get_collection","seasons_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"Seasons_get_collection","leaderbord"})
+     * @Groups({"seasons_get_collection","leaderbord"})
      * @Assert\NotBlank
      */
     private $year;
@@ -50,9 +50,27 @@ class Season
 
     /**
      * @ORM\OneToMany(targetEntity=Round::class, mappedBy="season", orphanRemoval=true)
-     * @Groups({"Seasons_get_collection"})
+     * @Groups({"seasons_get_collection"})
      */
     private $rounds;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"seasons_get_collection"})
+     */
+    private $startSeason;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"seasons_get_collection"})
+     */
+    private $startPlayoff;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"seasons_get_collection"})
+     */
+    private $Comment;
 
     public function __construct()
     {
@@ -157,6 +175,42 @@ class Season
                 $round->setSeason(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStartSeason(): ?\DateTimeInterface
+    {
+        return $this->startSeason;
+    }
+
+    public function setStartSeason(?\DateTimeInterface $startSeason): self
+    {
+        $this->startSeason = $startSeason;
+
+        return $this;
+    }
+
+    public function getStartPlayoff(): ?\DateTimeInterface
+    {
+        return $this->startPlayoff;
+    }
+
+    public function setStartPlayoff(?\DateTimeInterface $startPlayoff): self
+    {
+        $this->startPlayoff = $startPlayoff;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->Comment;
+    }
+
+    public function setComment(?string $Comment): self
+    {
+        $this->Comment = $Comment;
 
         return $this;
     }
