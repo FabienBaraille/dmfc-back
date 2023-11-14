@@ -6,6 +6,7 @@ use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\League;
 use App\Repository\UserRepository;
+use App\Repository\LeagueRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -98,6 +99,93 @@ class UserController extends AbstractController
             }
             $user->setLeague($league);
         }    
+
+        // Hasher le mot de passe avant la sauvegarde
+        $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+        $user->setPassword($hashedPassword);
+
+        $user->setCreatedAt(new \DateTime('now'));
+
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }            
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
+        $responseData = [
+        'message' => 'Utilisateur créer avec succès.',
+        'user' => $user, // Les données de l'utilisateur mis à jour
+        ];
+
+        return $this->json(
+        $responseData,
+        Response::HTTP_CREATED,
+        [
+        'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
+        ],
+        ['groups' => ['user_get_item']]
+        );
+    }
+    /**
+     * Create DMFC
+     *
+     * @Route("/api/user/new/dmfc", name="app_api_user_new_dmfc_post", methods={"POST"})
+     */
+    public function createDmfc(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, LeagueRepository $leagueRepository, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $jsonContent = $request->getContent();
+        $requestData = json_decode($jsonContent, true);
+
+        // Vérifiez si le nom d'utilisateur ou l'email est déjà utilisé
+        $existingUser = $userRepository->findOneBy(['username' => $requestData['username']]);
+        if ($existingUser) {
+            return $this->json(['error' => 'Nom d\'utilisateur déjà utilisé.'], Response::HTTP_CONFLICT);
+        }
+
+        $existingEmail = $userRepository->findOneBy(['email' => $requestData['email']]);
+        if ($existingEmail) {
+            return $this->json(['error' => 'Email déjà utilisé.'], Response::HTTP_CONFLICT);
+        }
+
+        $existingLeague = $leagueRepository->findOneBy(['leagueName' => $requestData['leagueName']]);
+        if ($existingLeague) {
+            return $this->json(['error' => 'League déjà existante.'], Response::HTTP_CONFLICT);
+        }
+
+        $league = new League;
+
+        $league->setCreatedAt(new \DateTime('now'));
+        $league->setLeagueName($requestData['leagueName']);
+
+        $errorsLeague = $validator->validate($league);
+
+        if (count($errorsLeague) > 0) {
+            $errorMessages = [];
+            foreach ($errorsLeague as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $entityManager->persist($league);
+        $entityManager->flush();
+
+        $user = new User;
+
+        $user->setUsername($requestData['username']);
+        $user->setEmail($requestData['email']);
+        $user->setRoles($requestData['roles']);
+        $user->setPassword($requestData['password']);
+        $user->setLeague($league);
 
         // Hasher le mot de passe avant la sauvegarde
         $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
