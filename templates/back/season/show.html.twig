@@ -14,6 +14,19 @@
             <tr>
                 <th>Année</th>
                 <td>{{ season.year }}</td>
+            <tr>
+                <th>Début de saison régulière</th>
+                <td>{{ season.startSeason ? season.startSeason|date("d/m/Y") : '' }}</td>
+            </tr>            
+            <tr>
+                <th>Début des playoffs</th>
+                <td>{{ season.startPlayoff ? season.startPlayoff|date("d/m/Y") : '' }}</td>
+            </tr>            
+            <tr>
+           
+            <tr>
+                <th>Commentaire</th>
+                <td>{{ season.comment }}</td>
             </tr>            
                      
         </tbody>

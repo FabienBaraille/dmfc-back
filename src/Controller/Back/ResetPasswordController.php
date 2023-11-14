@@ -54,7 +54,7 @@ class ResetPasswordController extends AbstractController
             );
         }
 
-        return $this->render('reset_password/request.html.twig', [
+        return $this->render('back/reset_password/request.html.twig', [
             'requestForm' => $form->createView(),
         ]);
     }
@@ -72,7 +72,7 @@ class ResetPasswordController extends AbstractController
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
         }
 
-        return $this->render('reset_password/check_email.html.twig', [
+        return $this->render('back/reset_password/check_email.html.twig', [
             'resetToken' => $resetToken,
         ]);
     }
@@ -129,10 +129,10 @@ class ResetPasswordController extends AbstractController
             // The session is cleaned up after the password has been changed.
             $this->cleanSessionAfterReset();
 
-            return $this->redirect('/login');
+            return $this->redirect('http://localhost:5173/login');
         }
 
-        return $this->render('reset_password/reset.html.twig', [
+        return $this->render('back/reset_password/reset.html.twig', [
             'resetForm' => $form->createView(),
         ]);
     }
@@ -168,7 +168,7 @@ class ResetPasswordController extends AbstractController
             ->from(new Address('quentinriviere@orange.fr', 'DMFC'))
             ->to($user->getEmail())
             ->subject('Your password reset request')
-            ->htmlTemplate('reset_password/email.html.twig')
+            ->htmlTemplate('back/reset_password/email.html.twig')
             ->context([
                 'resetToken' => $resetToken,
             ])
