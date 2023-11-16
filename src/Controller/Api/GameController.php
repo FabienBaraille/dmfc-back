@@ -56,7 +56,7 @@ class GameController extends AbstractController
      * 
      * @Route("/api/games/round/{id}", name="app_api_game_by_round", methods={"GET"})
      */
-    public function getGamesByRound(GameRepository $gameRepository, $id, EntityManagerInterface $entityManager): JsonResponse
+    public function getGamesByRound(GameRepository $gameRepository, SrpredictionRepository $predictionRepository, $id, EntityManagerInterface $entityManager): JsonResponse
     {
         $round = $entityManager->getRepository(Round::class)->find($id);
 
@@ -66,9 +66,17 @@ class GameController extends AbstractController
 
         // Utilisez la méthode personnalisée de votre GameRepository pour récupérer toutes les parties d'un round
         $games = $gameRepository->findByRound($round);
+        $pred = [];
+        foreach ($games as $game) {
+            $predictions = $predictionRepository->findBy(['Game' => $game]);
+            $pred[$game->getId()] = count($predictions)  == 0;
+        }
 
         return $this->json(
-            $games,
+            [
+                $games,
+                $pred
+            ],
             200,
             [],
             ['groups' => 'games_get_collection', 'games_get_round']
@@ -170,14 +178,14 @@ class GameController extends AbstractController
         // Vérifiez si la game existe
         if ($game === null) {
             // Réponse avec un statut 200 et le message
-            return $this->json(['message' => 'La game demandée n\'existe pas.'], 200);
+            return $this->json(['message' => 'Le match demandé n\'existe pas.'], 200);
         }
 
         $entityManager->remove($game);
         $entityManager->flush();
 
         // Réponse de succès
-        return $this->json(['message' => 'La game a été supprimée avec succès.'], 200);
+        return $this->json(['message' => 'Le match a été supprimé avec succès.'], 200);
     }
 
      /**
