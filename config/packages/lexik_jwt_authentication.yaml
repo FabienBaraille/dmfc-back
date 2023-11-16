@@ -9,4 +9,10 @@ lexik_jwt_authentication:
             enabled: true
             name: BEARER
     set_cookies:
-        BEARER: ~
+        BEARER:
+            lifetime: null
+            samesite: lax
+            path: /
+            domain: null
+            secure: false
+            httpOnly: true
