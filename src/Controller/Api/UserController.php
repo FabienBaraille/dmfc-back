@@ -129,9 +129,6 @@ class UserController extends AbstractController
         return $this->json(
         $responseData,
         Response::HTTP_CREATED,
-        [
-        'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-        ],
         ['groups' => ['user_get_item']]
         );
     }
@@ -199,8 +196,8 @@ class UserController extends AbstractController
             $errorMessages = [];
 
             foreach ($errors as $error) {
-            $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-            }            
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -216,9 +213,6 @@ class UserController extends AbstractController
         return $this->json(
         $responseData,
         Response::HTTP_CREATED,
-        [
-        'Location' => $this->generateUrl('app_api_user', ['id' => $user->getId()]),
-        ],
         ['groups' => ['user_get_item']]
         );
     }

@@ -47,7 +47,7 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
-     * @Groups ({"teams_get_collection", "user_get_item", "user_get_collection", "leagues_get_users"})
+     * @Groups ({"teams_get_collection", "user_get_item", "user_get_collection", "games_get_collection", "leagues_get_users"})
      */
     private $logo;
 
