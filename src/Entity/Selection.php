@@ -18,12 +18,12 @@ class Selection
     private $id;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      */
     private $selectedAway;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      */
     private $selectedHome;
 
@@ -36,6 +36,11 @@ class Selection
      * @ORM\ManyToOne(targetEntity=League::class, inversedBy="selections")
      */
     private $leagues;
+
+    public function __construct() {
+        $this->selectedAway = 0;
+        $this->selectedHome = 0;
+    }
 
     public function getId(): ?int
     {
