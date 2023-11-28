@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Game;
 use App\Entity\Team;
 use App\Entity\Round;
+use App\Entity\Selection;
 use App\Repository\GameRepository;
 use App\Repository\TeamRepository;
 use App\Repository\RoundRepository;
@@ -154,6 +155,20 @@ class GameController extends AbstractController
         }
 
         $entityManager->persist($game);
+        $entityManager->flush();
+
+        $league = $game->getRound()->getLeague();
+
+        $teamHome = $game->getTeam()[0];
+
+        $selectionTeamHome = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamHome])[0];
+        $selectionTeamHome->setSelectedHome($selectionTeamHome->getSelectedHome() + 1);
+
+        $teamAway = $game->getTeam()[1];
+        
+        $selectionTeamAway = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamAway])[0];
+        $selectionTeamAway->setSelectedAway($selectionTeamAway->getSelectedAway() + 1);
+
         $entityManager->flush();
 
         return $this->json(
