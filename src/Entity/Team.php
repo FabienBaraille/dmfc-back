@@ -20,7 +20,7 @@ class Team
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_item", "teams_get_collection","update_dmfc"})
+     * @Groups({"user_get_item", "games_get_collection", "teams_get_collection","update_dmfc"})
      */
     private $id;
 
@@ -47,7 +47,7 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
-     * @Groups ({"teams_get_collection", "user_get_item", "user_get_collection", "leagues_get_users"})
+     * @Groups ({"teams_get_collection", "user_get_item", "user_get_collection", "games_get_collection", "leagues_get_users"})
      */
     private $logo;
 
@@ -76,12 +76,18 @@ class Team
      */
     private $games;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Selection::class, mappedBy="teams")
+     */
+    private $selections;
+
     
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->games = new ArrayCollection();
+        $this->selections = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -225,6 +231,36 @@ class Team
     {
         if ($this->games->removeElement($game)) {
             $game->removeTeam($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Selection>
+     */
+    public function getSelections(): Collection
+    {
+        return $this->selections;
+    }
+
+    public function addSelection(Selection $selection): self
+    {
+        if (!$this->selections->contains($selection)) {
+            $this->selections[] = $selection;
+            $selection->setTeams($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSelection(Selection $selection): self
+    {
+        if ($this->selections->removeElement($selection)) {
+            // set the owning side to null (unless already changed)
+            if ($selection->getTeams() === $this) {
+                $selection->setTeams(null);
+            }
         }
 
         return $this;

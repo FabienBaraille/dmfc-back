@@ -23,7 +23,7 @@ class League
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180)
+     * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"user_get_collection","get_login_league", "leagues_get_collection", "news_get_collection", "user_get_item","rounds_get_collection","leaderbord"})
      */
     private $leagueName;
@@ -60,11 +60,17 @@ class League
      */
     private $news;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Selection::class, mappedBy="leagues")
+     */
+    private $selections;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->rounds = new ArrayCollection();
         $this->news = new ArrayCollection();
+        $this->selections = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -204,6 +210,36 @@ class League
             // set the owning side to null (unless already changed)
             if ($news->getLeague() === $this) {
                 $news->setLeague(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Selection>
+     */
+    public function getSelections(): Collection
+    {
+        return $this->selections;
+    }
+
+    public function addSelection(Selection $selection): self
+    {
+        if (!$this->selections->contains($selection)) {
+            $this->selections[] = $selection;
+            $selection->setLeagues($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSelection(Selection $selection): self
+    {
+        if ($this->selections->removeElement($selection)) {
+            // set the owning side to null (unless already changed)
+            if ($selection->getLeagues() === $this) {
+                $selection->setLeagues(null);
             }
         }
 
