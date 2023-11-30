@@ -28,59 +28,59 @@ class TeamController extends AbstractController
         );
     }
 
-        /**
-         * Create a new team
-         *
-         * @Route("/api/team", name="app_api_team_create", methods={"POST"})
-         */
-        public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
-        {
-            $jsonContent = $request->getContent();
+    /**
+     * Create a new team
+     *
+     * @Route("/api/team", name="app_api_team_create", methods={"POST"})
+     */
+    public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $jsonContent = $request->getContent();
 
-            $newTeam = $serializer->deserialize($jsonContent, Team::class, 'json');
+        $newTeam = $serializer->deserialize($jsonContent, Team::class, 'json');
 
-            $errors = $validator->validate($newTeam);
+        $errors = $validator->validate($newTeam);
 
-            if (count($errors) > 0) {
-                $errorMessages = [];
+        if (count($errors) > 0) {
+            $errorMessages = [];
 
-                foreach ($errors as $error) {
-                    $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-                }
-
-                return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
             }
 
-            // Vérifiez si le trigramme est déjà utilisé
-            $existingTeamWithSameTrigram = $entityManager->getRepository(Team::class)->findOneBy(['trigram' => $newTeam->getTrigram()]);
-            if ($existingTeamWithSameTrigram) {
-                return $this->json(['errors' => ['trigram' => 'Le trigramme est déjà utilisé.']], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-
-            // Vérifiez si le nom est déjà utilisé
-            $existingTeamWithSameName = $entityManager->getRepository(Team::class)->findOneBy(['name' => $newTeam->getName()]);
-            if ($existingTeamWithSameName) {
-                return $this->json(['errors' => ['name' => 'Le nom est déjà utilisé.']], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-
-
-            $newTeam->setCreatedAt(new \DateTime());
-
-            // Vérifiez si la conférence est valide
-            if (!in_array($newTeam->getConference(), ['Eastern', 'Western'])) {
-                return $this->json(['errors' => ['conference' => 'La conférence doit être "Eastern" ou "Western".']], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-            // Persistez la nouvelle équipe dans la base de données
-            $entityManager->persist($newTeam);
-            $entityManager->flush();
-
-            return $this->json(
-                $newTeam,
-                Response::HTTP_CREATED,
-                [],
-                ['groups' => 'teams_get_collection']
-            );
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+
+        // Vérifiez si le trigramme est déjà utilisé
+        $existingTeamWithSameTrigram = $entityManager->getRepository(Team::class)->findOneBy(['trigram' => $newTeam->getTrigram()]);
+        if ($existingTeamWithSameTrigram) {
+            return $this->json(['errors' => ['trigram' => 'Le trigramme est déjà utilisé.']], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // Vérifiez si le nom est déjà utilisé
+        $existingTeamWithSameName = $entityManager->getRepository(Team::class)->findOneBy(['name' => $newTeam->getName()]);
+        if ($existingTeamWithSameName) {
+            return $this->json(['errors' => ['name' => 'Le nom est déjà utilisé.']], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+
+        $newTeam->setCreatedAt(new \DateTime());
+
+        // Vérifiez si la conférence est valide
+        if (!in_array($newTeam->getConference(), ['Eastern', 'Western'])) {
+            return $this->json(['errors' => ['conference' => 'La conférence doit être "Eastern" ou "Western".']], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        // Persistez la nouvelle équipe dans la base de données
+        $entityManager->persist($newTeam);
+        $entityManager->flush();
+
+        return $this->json(
+            $newTeam,
+            Response::HTTP_CREATED,
+            [],
+            ['groups' => 'teams_get_collection']
+        );
+    }
 
 
     /**
