@@ -212,7 +212,7 @@ class GameController extends AbstractController
         // Getting league Id
         $league = $game->getRound()->getLeague();
 
-        $teamHome = $game->getTeam()[1];
+        $teamHome = $game->getTeam()[0];
         // Getting selection infos for home team
         $selectionTeamHome = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamHome])[0];
         if (!$selectionTeamHome) {
@@ -220,7 +220,7 @@ class GameController extends AbstractController
         }
         $selectionTeamHome->setSelectedHome($selectionTeamHome->getSelectedHome() - 1);
 
-        $teamAway = $game->getTeam()[0];
+        $teamAway = $game->getTeam()[1];
         // Getting selection infos for visitor team
         $selectionTeamAway = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamAway])[0];
         if (!$selectionTeamAway) {
