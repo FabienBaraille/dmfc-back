@@ -73,6 +73,12 @@ class Game
      * @Groups({"games_get_collection", "games_get_post"})
      */
     private $team;
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"games_get_collection","prediction","rounds_get_collection", "games_get_round", "games_get_post"})
+     */
+    private $teamOrder = [];
     public function __construct()
     {
         $this->team = new ArrayCollection();
@@ -210,6 +216,18 @@ class Game
     public function removeTeam(Team $team): self
     {
         $this->team->removeElement($team);
+        return $this;
+    }
+
+    public function getTeamOrder(): ?array
+    {
+        return $this->teamOrder;
+    }
+
+    public function setTeamOrder(?array $teamOrder): self
+    {
+        $this->teamOrder = $teamOrder;
+
         return $this;
     }
 }
