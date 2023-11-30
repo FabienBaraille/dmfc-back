@@ -44,7 +44,7 @@ class GameController extends AbstractController
     public function getGamesByUser(GameRepository $gameRepository, $id): JsonResponse
     {
         return $this->json(
-            $gameRepository->find($id),
+            $game = $gameRepository->find($id),
             200,
             [],
             ['groups' => 'games_get_collection']
@@ -129,6 +129,7 @@ class GameController extends AbstractController
                 }
                 $game->addTeam($team);
             }
+            $game->setTeamOrder($teamIds);
         }
 
         $game->setCreatedAt(new \DateTime('now'));

@@ -20,7 +20,7 @@ class Team
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_item", "teams_get_collection","update_dmfc"})
+     * @Groups({"user_get_item", "teams_get_collection", "update_dmfc", "games_get_collection", "games_get_post"})
      */
     private $id;
 
