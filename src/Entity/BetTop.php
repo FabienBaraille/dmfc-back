@@ -49,6 +49,11 @@ class BetTop
      */
     private $topten;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $pointsEarned;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +127,18 @@ class BetTop
     public function setTopten(?TopTen $topten): self
     {
         $this->topten = $topten;
+
+        return $this;
+    }
+
+    public function getPointsEarned(): ?int
+    {
+        return $this->pointsEarned;
+    }
+
+    public function setPointsEarned(?int $pointsEarned): self
+    {
+        $this->pointsEarned = $pointsEarned;
 
         return $this;
     }
