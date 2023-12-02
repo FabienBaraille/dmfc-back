@@ -81,9 +81,7 @@ class RoundController extends AbstractController
         return $this->json(
             $round,
             Response::HTTP_CREATED,
-            [
-                // 'Location' => $this->generateUrl('app_api_round', ['id' => $round->getId()]),
-            ],
+            [],
             ['groups' => ['rounds_get_collection']]
         );
     }
@@ -139,9 +137,7 @@ class RoundController extends AbstractController
     return $this->json(
     $round,
     Response::HTTP_OK,
-    [
-    'Location' => $this->generateUrl('api_id_update_round', ['id' => $round->getId()]),
-    ],
+    [],
     ['groups' => ['rounds_get_collection']]
     );
   }

@@ -77,9 +77,7 @@ class SeasonController extends AbstractController
         return $this->json(
             $season,
             Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_season_get_by_id', ['id' => $season->getId()]),
-            ],
+            [],
             ['groups' => 'seasons_get_collection']
         );
     }

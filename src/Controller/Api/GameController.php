@@ -185,9 +185,7 @@ class GameController extends AbstractController
         return $this->json(
             $game,
             Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_game', ['id' => $game->getId()]),
-            ],
+            [],
             ['groups' => ['games_get_post']]
         );
     }
@@ -336,7 +334,7 @@ class GameController extends AbstractController
         return $this->json(
             ['message' => 'La modification a été effectuée avec succès.', 'game' => $updatedGame],
             Response::HTTP_OK,
-            ['Location' => $this->generateUrl('app_api_game', ['id' => $updatedGame->getId()])],
+            [],
             ['groups' => ['games_get_post']]
         );
     }
