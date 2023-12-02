@@ -45,9 +45,15 @@ class TopTen
      */
     private $round;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BetTop::class, mappedBy="topten", orphanRemoval=true)
+     */
+    private $betTops;
+
     public function __construct()
     {
         $this->team = new ArrayCollection();
+        $this->betTops = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -123,6 +129,36 @@ class TopTen
     public function setRound(?Round $round): self
     {
         $this->round = $round;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BetTop>
+     */
+    public function getBetTops(): Collection
+    {
+        return $this->betTops;
+    }
+
+    public function addBetTop(BetTop $betTop): self
+    {
+        if (!$this->betTops->contains($betTop)) {
+            $this->betTops[] = $betTop;
+            $betTop->setTopten($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBetTop(BetTop $betTop): self
+    {
+        if ($this->betTops->removeElement($betTop)) {
+            // set the owning side to null (unless already changed)
+            if ($betTop->getTopten() === $this) {
+                $betTop->setTopten(null);
+            }
+        }
 
         return $this;
     }
