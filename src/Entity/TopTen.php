@@ -6,6 +6,7 @@ use App\Repository\TopTenRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=TopTenRepository::class)
@@ -16,16 +17,19 @@ class TopTen
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"topten_get_collection", "topten_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=11)
+     * @Groups({"topten_get_collection", "topten_get_post"})
      */
     private $conference;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"topten_get_collection", "topten_get_post"})
      */
     private $deadline;
 
@@ -36,17 +40,20 @@ class TopTen
 
     /**
      * @ORM\ManyToMany(targetEntity=Team::class)
+     * @Groups({"topten_get_collection", "topten_get_post"})
      */
     private $team;
 
     /**
      * @ORM\ManyToOne(targetEntity=Round::class, inversedBy="topTens")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"topten_get_collection", "topten_get_post"})
      */
     private $round;
 
     /**
      * @ORM\OneToMany(targetEntity=BetTop::class, mappedBy="topten", orphanRemoval=true)
+     * @Groups({"topten_get_collection"})
      */
     private $betTops;
 

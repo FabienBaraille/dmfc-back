@@ -125,7 +125,7 @@ class UserController extends AbstractController
 
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
-        'message' => 'Utilisateur créer avec succès.',
+        'message' => 'Utilisateur créé avec succès.',
         'user' => $user, // Les données de l'utilisateur mis à jour
         ];
 
@@ -228,7 +228,7 @@ class UserController extends AbstractController
 
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
-        'message' => 'Utilisateur créer avec succès.',
+        'message' => 'Utilisateur créé avec succès.',
         'user' => $user, // Les données de l'utilisateur mis à jour
         ];
 

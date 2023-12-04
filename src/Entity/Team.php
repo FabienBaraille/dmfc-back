@@ -20,34 +20,34 @@ class Team
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_item", "games_get_collection", "games_get_post", "teams_get_collection","update_dmfc", "selections_get_collection"})
+     * @Groups({"user_get_item", "games_get_collection", "games_get_post", "teams_get_collection","update_dmfc", "selections_get_collection", "topten_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=3, unique=true)
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users", "selections_get_collection"})
+     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users", "selections_get_collection", "topten_get_post"})
      * @Assert\NotBlank
      */
     private $trigram;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users", "selections_get_collection"})
+     * @Groups({"user_get_collection","user_get_item", "teams_get_collection", "games_get_collection", "games_get_post", "leagues_get_users", "selections_get_collection", "topten_get_post"})
      * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=10)
-     * @Groups ({"teams_get_collection"})
+     * @Groups ({"teams_get_collection", "topten_get_post"})
      * @Assert\NotBlank
      */
     private $conference;
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
-     * @Groups ({"teams_get_collection", "user_get_item", "user_get_collection", "games_get_collection", "leagues_get_users", "selections_get_collection"})
+     * @Groups ({"teams_get_collection", "user_get_item", "user_get_collection", "games_get_collection", "leagues_get_users", "selections_get_collection", "topten_get_post"})
      */
     private $logo;
 

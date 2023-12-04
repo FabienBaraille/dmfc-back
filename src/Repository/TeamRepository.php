@@ -39,6 +39,15 @@ class TeamRepository extends ServiceEntityRepository
         }
     }
 
+    public function findTeamByConference($conf): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.conference = :conference')
+            ->setParameter('conference', $conf)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Team[] Returns an array of Team objects
 //     */

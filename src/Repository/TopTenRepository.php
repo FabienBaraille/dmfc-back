@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\TopTen;
+use App\Entity\Round;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -37,6 +38,22 @@ class TopTenRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * Récupère toutes les topten associés à un round donné.
+     *
+     * @param Round $round Le round pour lequel vous souhaitez récupérer les parties.
+     *
+     * @return TopTen[] Un tableau de topten associés au round.
+     */
+    public function findByRound(Round $round): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.round = :round')
+            ->setParameter('round', $round)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**
