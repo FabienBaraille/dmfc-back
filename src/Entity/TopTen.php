@@ -35,6 +35,7 @@ class TopTen
 
     /**
      * @ORM\Column(type="array", nullable=true)
+     * @Groups({"topten_get_collection", "topten_get_post"})
      */
     private $results = [];
 

@@ -124,11 +124,11 @@ class RoundController extends AbstractController
     if (count($errors) > 0) {
       $errorMessages = [];
 
-    foreach ($errors as $error) {
-      $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-    }
+      foreach ($errors as $error) {
+        $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+      }
 
-    return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+      return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     // Persistez les modifications dans la base de données

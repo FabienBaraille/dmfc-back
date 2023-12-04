@@ -201,8 +201,8 @@ class GameController extends AbstractController
 
         // Vérifiez si la game existe
         if ($game === null) {
-            // Réponse avec un statut 200 et le message
-            return $this->json(['message' => 'Le match demandé n\'existe pas.'], 200);
+            // Réponse avec un statut 404 et le message
+            return $this->json(['message' => 'Le match demandé n\'existe pas.'], 404);
         }
 
         $entityManager->remove($game);

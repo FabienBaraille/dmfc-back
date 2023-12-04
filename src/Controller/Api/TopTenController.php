@@ -91,7 +91,7 @@ class TopTenController extends AbstractController
         if (count($errorsEast) > 0) {
             $errorMessages = [];
 
-            foreach ($errors as $error) {
+            foreach ($errorsEast as $error) {
                 $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
             }
 
@@ -111,7 +111,7 @@ class TopTenController extends AbstractController
         if (count($errorsWest) > 0) {
             $errorMessages = [];
 
-            foreach ($errors as $error) {
+            foreach ($errorsWest as $error) {
                 $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
             }
 
@@ -128,11 +128,65 @@ class TopTenController extends AbstractController
             ],
             Response::HTTP_CREATED,
             [],
-            ['groups' => ['topten_get_post']]
+            ['groups' => 'topten_get_post']
         );
     }
-    // Update TopTen deadline, results
+    /**
+     * Update Top ten
+     * 
+     * @Route("/api/topten/{id}", name="app_api_topten_update", methods={"PUT"})
+     */
+    public function updateTopTen(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, $id): JsonResponse
+    {
+        $topten = $entityManager->getRepository(TopTen::class)->find($id);
 
-    // Delete TopTen
-    
+        if ($topten === null) {
+            return $this->json(['message' => 'Le match demandé n\'existe pas.'], 404);
+        }
+
+        $jsonContent = $request->getContent();
+        $toptenData = json_decode($jsonContent, true);
+
+        if (isset($toptenData['deadline'])) {
+            $topten->setDeadline(new \DateTime($toptenData['deadline']));
+        }
+
+        if (isset($toptenData['results'])) {
+            $topten->setResults($toptenData['results']);
+        }
+
+        $errors = $validator->validate($topten);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+            }
+            return $this->json(['errors' => $errorMessages, Response::HTTP_UNPROCESSABLE_ENTITY]);
+        }
+        return $this->json(
+            $topten,
+            Response::HTTP_OK,
+            [],
+            ['groups' => 'topten_get_post']
+        );
+    }
+    /**
+     * Delete Top ten
+     * 
+     * @Route("/api/topten/{id}", name="app_api_topten_delete", methods={"DELETE"})
+     */
+    public function deleteTopTen(EntityManagerInterface $entityManager, $id): JsonResponse
+    {
+        $topten = $entityManager->getRepository(TopTen::class)->find($id);
+
+        if ($topten === null) {
+            return $this->json(['message' => 'Le match demandé n\'existe pas.'], 404);
+        }
+
+        $entityManager->remove($topten);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Top ten a été supprimé avec succès.'], 200);
+    }
 }

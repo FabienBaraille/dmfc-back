@@ -3,7 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\BetTopRepository;
+
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=BetTopRepository::class)
@@ -14,21 +22,25 @@ class BetTop
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"betTop_get_collection", "bettop_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="array")
+     * @Groups({"betTop_get_collection", "bettop_get_post"})
      */
     private $predictedRanking = [];
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Groups({"betTop_get_collection", "bettop_get_post"})
      */
     private $validationStatus;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups({"bettop_get_post"})
      */
     private $createdAt;
 
@@ -40,17 +52,20 @@ class BetTop
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="betTops")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"betTop_get_collection", "bettop_get_post"})
      */
     private $User;
 
     /**
      * @ORM\ManyToOne(targetEntity=TopTen::class, inversedBy="betTops")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"betTop_get_collection", "bettop_get_post"})
      */
     private $topten;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"betTop_get_collection", "bettop_get_post"})
      */
     private $pointsEarned;
 
