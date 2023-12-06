@@ -164,6 +164,10 @@ class TopTenController extends AbstractController
             }
             return $this->json(['errors' => $errorMessages, Response::HTTP_UNPROCESSABLE_ENTITY]);
         }
+        
+        $entityManager->persist($topten);
+        $entityManager->flush();
+
         return $this->json(
             $topten,
             Response::HTTP_OK,
