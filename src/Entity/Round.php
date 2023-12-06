@@ -73,6 +73,7 @@ class Round
 
     /**
      * @ORM\OneToMany(targetEntity=TopTen::class, mappedBy="round", orphanRemoval=true)
+     * @Groups({"rounds_get_collection"})
      */
     private $topTens;
 

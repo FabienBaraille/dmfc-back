@@ -40,7 +40,7 @@ class Team
 
     /**
      * @ORM\Column(type="string", length=10)
-     * @Groups ({"teams_get_collection", "topten_get_post"})
+     * @Groups ({"teams_get_collection", "topten_get_post", "selections_get_collection"})
      * @Assert\NotBlank
      */
     private $conference;
