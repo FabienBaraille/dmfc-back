@@ -5,8 +5,11 @@ namespace App\Controller\Api;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\League;
+use App\Entity\Selection;
 use App\Repository\UserRepository;
 use App\Repository\LeagueRepository;
+use App\Repository\SelectionRepository;
+use App\Repository\TeamRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -137,7 +140,7 @@ class UserController extends AbstractController
      *
      * @Route("/api/user/new/dmfc", name="app_api_user_new_dmfc_post", methods={"POST"})
      */
-    public function createDmfc(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, LeagueRepository $leagueRepository, UserPasswordHasherInterface $passwordHasher): Response
+    public function createDmfc(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserRepository $userRepository, LeagueRepository $leagueRepository, TeamRepository $teamRepository, UserPasswordHasherInterface $passwordHasher): Response
     {
         $jsonContent = $request->getContent();
         $requestData = json_decode($jsonContent, true);
@@ -175,6 +178,24 @@ class UserController extends AbstractController
 
         $entityManager->persist($league);
         $entityManager->flush();
+
+        $allTeams = $teamRepository->findAll();
+        foreach ($allTeams as $team) {
+            $selection = new Selection;
+            $selection->setTeams($team);
+            $selection->setLeagues($league);
+            $errorsSelection = $validator->validate($selection);
+
+            if (count($errorsSelection) > 0) {
+                $errorMessages = [];
+                foreach ($errorsSelection as $error) {
+                    $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+                }
+                return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            $entityManager->persist($selection);
+            $entityManager->flush();
+        }
 
         $user = new User;
 

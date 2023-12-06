@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Game;
 use App\Entity\Team;
 use App\Entity\Round;
+use App\Entity\Selection;
 use App\Repository\GameRepository;
 use App\Repository\TeamRepository;
 use App\Repository\RoundRepository;
@@ -44,7 +45,7 @@ class GameController extends AbstractController
     public function getGamesByUser(GameRepository $gameRepository, $id): JsonResponse
     {
         return $this->json(
-            $gameRepository->find($id),
+            $game = $gameRepository->find($id),
             200,
             [],
             ['groups' => 'games_get_collection']
@@ -137,6 +138,7 @@ class GameController extends AbstractController
                 }
                 $game->addTeam($team);
             }
+            $game->setTeamOrder($teamIds);
         }
 
         $game->setCreatedAt(new \DateTime('now'));
@@ -154,6 +156,30 @@ class GameController extends AbstractController
         }
 
         $entityManager->persist($game);
+        $entityManager->flush();
+
+        // Game Creation End
+        // Update of the count of selected teams
+
+        // Getting league Id
+        $league = $game->getRound()->getLeague();
+
+        $teamHome = $game->getTeam()[1];
+        // Getting selection infos for home team
+        $selectionTeamHome = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamHome])[0];
+        if (!$selectionTeamHome) {
+            return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+        }
+        $selectionTeamHome->setSelectedHome($selectionTeamHome->getSelectedHome() + 1);
+
+        $teamAway = $game->getTeam()[0];
+        // Getting selection infos for visitor team
+        $selectionTeamAway = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamAway])[0];
+        if (!$selectionTeamAway) {
+            return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+        }
+        $selectionTeamAway->setSelectedAway($selectionTeamAway->getSelectedAway() + 1);
+
         $entityManager->flush();
 
         return $this->json(
@@ -182,6 +208,26 @@ class GameController extends AbstractController
         }
 
         $entityManager->remove($game);
+        // Update of the count of selected teams
+
+        // Getting league Id
+        $league = $game->getRound()->getLeague();
+
+        $teamHome = $game->getTeam()[0]->getId() == $game->getTeamOrder()[1] ? $game->getTeam()[0] : $game->getTeam()[1];
+        // Getting selection infos for home team
+        $selectionTeamHome = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamHome])[0];
+        if (!$selectionTeamHome) {
+            return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+        }
+        $selectionTeamHome->setSelectedHome($selectionTeamHome->getSelectedHome() - 1);
+
+        $teamAway = $game->getTeam()[0]->getId() == $game->getTeamOrder()[0] ? $game->getTeam()[0] : $game->getTeam()[1];;
+        // Getting selection infos for visitor team
+        $selectionTeamAway = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamAway])[0];
+        if (!$selectionTeamAway) {
+            return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+        }
+        $selectionTeamAway->setSelectedAway($selectionTeamAway->getSelectedAway() - 1);
         $entityManager->flush();
 
         // Réponse de succès
@@ -217,6 +263,26 @@ class GameController extends AbstractController
         // Vérifiez si le champ "teams" existe et si oui, mettez à jour le jeu avec les nouvelles équipes
         if (isset($gameData['teams'])) {
             $teamIds = $gameData['teams'];
+
+            $league = $game->getRound()->getLeague();
+
+            $teamHome = $game->getTeam()[0]->getId() == $game->getTeamOrder()[1] ? $game->getTeam()[0] : $game->getTeam()[1];
+            // Getting selection infos for home team
+            $selectionTeamHome = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamHome])[0];
+            if (!$selectionTeamHome) {
+                return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+            }
+            $selectionTeamHome->setSelectedHome($selectionTeamHome->getSelectedHome() - 1);
+
+            $teamAway = $game->getTeam()[0]->getId() == $game->getTeamOrder()[0] ? $game->getTeam()[0] : $game->getTeam()[1];;
+            // Getting selection infos for visitor team
+            $selectionTeamAway = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamAway])[0];
+            if (!$selectionTeamAway) {
+                return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+            }
+            $selectionTeamAway->setSelectedAway($selectionTeamAway->getSelectedAway() - 1);
+            $entityManager->flush();
+
             $updatedGame->clearTeams(); // Supprimer les équipes actuelles pour éviter les doublons
             foreach ($teamIds as $teamId) {
                 $team = $entityManager->getRepository(Team::class)->find($teamId);
@@ -225,6 +291,22 @@ class GameController extends AbstractController
                 }
                 $updatedGame->addTeam($team);
             }
+            $updatedGame->setTeamOrder($teamIds);
+            $teamHome = $updatedGame->getTeam()[1];
+            // Getting selection infos for home team
+            $selectionTeamHome = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamHome])[0];
+            if (!$selectionTeamHome) {
+                return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+            }
+            $selectionTeamHome->setSelectedHome($selectionTeamHome->getSelectedHome() + 1);
+
+            $teamAway = $updatedGame->getTeam()[0];
+            // Getting selection infos for visitor team
+            $selectionTeamAway = $entityManager->getRepository(Selection::class)->findBy(['leagues' => $league, 'teams' => $teamAway])[0];
+            if (!$selectionTeamAway) {
+                return $this->json(['error' => "Ce décompte n'existe pas."], Response::HTTP_NOT_FOUND);
+            }
+            $selectionTeamAway->setSelectedAway($selectionTeamAway->getSelectedAway() + 1);
         }
         // Vérifiez si le champ "homeOdd" existe et si oui, mettez à jour la cote à domicile
         if (isset($gameData['homeOdd'])) {

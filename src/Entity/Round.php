@@ -54,6 +54,7 @@ class Round
     /**
      * @ORM\ManyToOne(targetEntity=League::class, inversedBy="rounds")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"games_get_post"})
      */
     private $league;
 
