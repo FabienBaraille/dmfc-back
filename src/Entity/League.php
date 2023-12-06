@@ -18,7 +18,7 @@ class League
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection","get_login_league","leagues_get_collection", "user_get_item", "news_get_item","rounds_get_collection", "games_get_post"})
+     * @Groups({"user_get_collection","get_login_league","leagues_get_collection", "user_get_item", "news_get_item","rounds_get_collection", "games_get_post", "topten_get_post"})
      */
     private $id;
 

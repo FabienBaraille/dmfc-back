@@ -81,9 +81,7 @@ class RoundController extends AbstractController
         return $this->json(
             $round,
             Response::HTTP_CREATED,
-            [
-                // 'Location' => $this->generateUrl('app_api_round', ['id' => $round->getId()]),
-            ],
+            [],
             ['groups' => ['rounds_get_collection']]
         );
     }
@@ -126,11 +124,11 @@ class RoundController extends AbstractController
     if (count($errors) > 0) {
       $errorMessages = [];
 
-    foreach ($errors as $error) {
-      $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-    }
+      foreach ($errors as $error) {
+        $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+      }
 
-    return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+      return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     // Persistez les modifications dans la base de données
@@ -139,9 +137,7 @@ class RoundController extends AbstractController
     return $this->json(
     $round,
     Response::HTTP_OK,
-    [
-    'Location' => $this->generateUrl('api_id_update_round', ['id' => $round->getId()]),
-    ],
+    [],
     ['groups' => ['rounds_get_collection']]
     );
   }

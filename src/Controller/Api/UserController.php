@@ -125,13 +125,14 @@ class UserController extends AbstractController
 
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
-        'message' => 'Utilisateur créer avec succès.',
+        'message' => 'Utilisateur créé avec succès.',
         'user' => $user, // Les données de l'utilisateur mis à jour
         ];
 
         return $this->json(
         $responseData,
         Response::HTTP_CREATED,
+        [],
         ['groups' => ['user_get_item']]
         );
     }
@@ -227,13 +228,14 @@ class UserController extends AbstractController
 
         // Retournez une réponse JSON avec les données de l'utilisateur mis à jour
         $responseData = [
-        'message' => 'Utilisateur créer avec succès.',
+        'message' => 'Utilisateur créé avec succès.',
         'user' => $user, // Les données de l'utilisateur mis à jour
         ];
 
         return $this->json(
         $responseData,
         Response::HTTP_CREATED,
+        [],
         ['groups' => ['user_get_item']]
         );
     }
@@ -363,7 +365,12 @@ class UserController extends AbstractController
             'user' => $user, // Les données de l'utilisateur mis à jour
         ];
         
-        return $this->json($responseData, Response::HTTP_OK, [], ['groups' => ['user_get_item']]);
+        return $this->json(
+            $responseData,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['user_get_item']]
+        );
     }
 
 

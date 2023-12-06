@@ -24,13 +24,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","rounds_get_collection","leaderbord","prediction"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "rounds_get_collection", "leaderbord", "prediction"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users","leaderbord","prediction"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users", "leaderbord", "prediction"})
      * @Assert\NotBlank
      */
     private $username;
@@ -123,11 +123,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $rounds;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BetTop::class, mappedBy="User", orphanRemoval=true)
+     */
+    private $betTops;
+
     public function __construct()
     {
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
         $this->rounds = new ArrayCollection();
+        $this->betTops = new ArrayCollection();
     }
 
 
@@ -406,6 +412,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, BetTop>
+     */
+    public function getBetTops(): Collection
+    {
+        return $this->betTops;
+    }
+
+    public function addBetTop(BetTop $betTop): self
+    {
+        if (!$this->betTops->contains($betTop)) {
+            $this->betTops[] = $betTop;
+            $betTop->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBetTop(BetTop $betTop): self
+    {
+        if ($this->betTops->removeElement($betTop)) {
+            // set the owning side to null (unless already changed)
+            if ($betTop->getUser() === $this) {
+                $betTop->setUser(null);
+            }
+        }
+
+        return $this;
     }
     
 }

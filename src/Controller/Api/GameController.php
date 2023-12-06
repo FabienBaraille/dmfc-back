@@ -185,9 +185,7 @@ class GameController extends AbstractController
         return $this->json(
             $game,
             Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_game', ['id' => $game->getId()]),
-            ],
+            [],
             ['groups' => ['games_get_post']]
         );
     }
@@ -203,8 +201,8 @@ class GameController extends AbstractController
 
         // Vérifiez si la game existe
         if ($game === null) {
-            // Réponse avec un statut 200 et le message
-            return $this->json(['message' => 'Le match demandé n\'existe pas.'], 200);
+            // Réponse avec un statut 404 et le message
+            return $this->json(['message' => 'Le match demandé n\'existe pas.'], 404);
         }
 
         $entityManager->remove($game);
@@ -336,7 +334,7 @@ class GameController extends AbstractController
         return $this->json(
             ['message' => 'La modification a été effectuée avec succès.', 'game' => $updatedGame],
             Response::HTTP_OK,
-            ['Location' => $this->generateUrl('app_api_game', ['id' => $updatedGame->getId()])],
+            [],
             ['groups' => ['games_get_post']]
         );
     }
