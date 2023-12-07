@@ -17,19 +17,19 @@ class TopTen
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"topten_get_collection", "topten_get_post", "rounds_get_collection"})
+     * @Groups({"topten_get_collection", "topten_get_post", "rounds_get_collection", "betTop_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=11)
-     * @Groups({"topten_get_collection", "topten_get_post", "rounds_get_collection"})
+     * @Groups({"topten_get_collection", "topten_get_post", "rounds_get_collection", "betTop_get_collection"})
      */
     private $conference;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"topten_get_collection", "topten_get_post"})
+     * @Groups({"topten_get_collection", "topten_get_post", "rounds_get_collection", "betTop_get_collection"})
      */
     private $deadline;
 

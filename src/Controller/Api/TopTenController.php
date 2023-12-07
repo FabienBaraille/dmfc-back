@@ -169,7 +169,7 @@ class TopTenController extends AbstractController
         $entityManager->flush();
 
         return $this->json(
-            $topten,
+            ['message' => 'Top 10 mis à jour avec succès.'],
             Response::HTTP_OK,
             [],
             ['groups' => 'topten_get_post']

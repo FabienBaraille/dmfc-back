@@ -71,6 +71,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
+     */
+    private $scoreTOP;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
+     */
+    private $scorePO;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
      * @Groups({"user_get_collection", "leagues_get_collection"})
       */
     private $oldPosition;
@@ -230,6 +242,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setScore(?int $score): self
     {
         $this->score = $score;
+
+        return $this;
+    }
+
+    public function getScoreTOP(): ?int
+    {
+        return $this->scoreTOP;
+    }
+
+    public function setScoreTOP(?int $scoreTOP): self
+    {
+        $this->scoreTOP = $scoreTOP;
+
+        return $this;
+    }
+
+    public function getScorePO(): ?int
+    {
+        return $this->scorePO;
+    }
+
+    public function setScorePO(?int $scorePO): self
+    {
+        $this->scorePO = $scorePO;
 
         return $this;
     }
@@ -443,5 +479,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
     
 }
