@@ -396,6 +396,13 @@ class UserController extends AbstractController
         if (isset($data['score'])) {
             $user->setScore($data['score']);
         }
+
+        if (isset($data['scoreTOP'])) {
+            $user->setScoreTOP($data['scoreTOP']);
+        }
+        if (isset($data['scorePO'])) {
+            $user->setScorePO($data['scorePO']);
+        }
         
         if (isset($data['oldPosition'])) {
             $user->setOldPosition($data['oldPosition']);
@@ -436,10 +443,11 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         // Créez une réponse JSON pour indiquer que la mise à jour a réussi
-        $response = [
-            'message' => 'Mise à jour réussie',
-        ];
-
-        return new JsonResponse($response);
+        return $this->json(
+            $user,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['user_get_item']]
+        );
     }
 }

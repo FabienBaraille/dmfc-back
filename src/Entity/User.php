@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "rounds_get_collection", "leaderbord", "prediction"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "rounds_get_collection", "leaderbord", "prediction", "betTop_get_collection"})
      */
     private $id;
 
@@ -68,18 +68,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
      */
     private $score;
-
-    /**
-     * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
-     */
-    private $scoreTOP;
-
-    /**
-     * @ORM\Column(type="smallint", nullable=true)
-     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
-     */
-    private $scorePO;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
@@ -139,6 +127,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\OneToMany(targetEntity=BetTop::class, mappedBy="User", orphanRemoval=true)
      */
     private $betTops;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
+     */
+    private $scoreTOP;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
+     */
+    private $scorePO;
 
     public function __construct()
     {
@@ -242,30 +242,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setScore(?int $score): self
     {
         $this->score = $score;
-
-        return $this;
-    }
-
-    public function getScoreTOP(): ?int
-    {
-        return $this->scoreTOP;
-    }
-
-    public function setScoreTOP(?int $scoreTOP): self
-    {
-        $this->scoreTOP = $scoreTOP;
-
-        return $this;
-    }
-
-    public function getScorePO(): ?int
-    {
-        return $this->scorePO;
-    }
-
-    public function setScorePO(?int $scorePO): self
-    {
-        $this->scorePO = $scorePO;
 
         return $this;
     }
@@ -476,6 +452,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $betTop->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    
+    public function getScoreTOP(): ?int
+    {
+        return $this->scoreTOP;
+    }
+
+    public function setScoreTOP(?int $scoreTOP): self
+    {
+        $this->scoreTOP = $scoreTOP;
+
+        return $this;
+    }
+
+    public function getScorePO(): ?int
+    {
+        return $this->scorePO;
+    }
+
+    public function setScorePO(?int $scorePO): self
+    {
+        $this->scorePO = $scorePO;
 
         return $this;
     }

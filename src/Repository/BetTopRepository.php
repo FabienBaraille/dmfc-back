@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\BetTop;
 use App\Entity\User;
+use App\Entity\TopTen;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -44,7 +45,7 @@ class BetTopRepository extends ServiceEntityRepository
     /**
      * Find all top10 bet made by a player
      *
-     * @param User $user user id
+     * @param User $user user entity
      * @return array of top 10 bet
      */
     public function findByPlayerId(User $user): array
@@ -52,6 +53,21 @@ class BetTopRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('b')
             ->andWhere('b.User = :user')
             ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find all bets made for a Top 10
+     *
+     * @param TopTen $topten top ten entity
+     * @return array of top 10 bet
+     */
+    public function findByTopten(TopTen $topten): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.topten = :topten')
+            ->setParameter('topten', $topten)
             ->getQuery()
             ->getResult();
     }

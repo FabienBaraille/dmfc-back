@@ -43,9 +43,31 @@ class BetTopController extends AbstractController
         );
     }
     /**
+     * Get bet top by Top 10 id
+     * 
+     * @Route("/api/bettop/topten/{id}", name="app_api_bettop_topten", methods={"GET"})
+     */
+    public function getBetTopByTopId(BetTopRepository $betTopRepository, $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $topten = $entityManager->getRepository(TopTen::class)->find($id);
+
+        if ($topten === null) {
+            return $this->json(['message' => 'Ce top 10 n\'a pas été trouvé'], Response::HTTP_NOT_FOUND);
+        }
+
+        $bettop = $betTopRepository->findByTopten($topten);
+
+        return $this->json(
+            $bettop,
+            200,
+            [],
+            ['groups' => 'betTop_get_collection']
+        );
+    }
+    /**
      * Create bet top10
      * 
-     * @Route("/api/bettop/new", "app_api_bettop_create", methods={"POST"})
+     * @Route("/api/bettop/new", name="app_api_bettop_create", methods={"POST"})
      */
     public function createBetTop(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
@@ -167,7 +189,7 @@ class BetTopController extends AbstractController
         $entityManager->flush();
 
         return $this->json(
-            $betTop,
+            ['message' => 'Points gagnés enregistrés avec succès.'],
             Response::HTTP_OK,
             [],
             ['groups' => 'bettop_get_post']
