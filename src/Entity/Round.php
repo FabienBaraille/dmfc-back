@@ -18,13 +18,13 @@ class Round
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"rounds_get_collection", "games_get_collection", "games_get_post"})
+     * @Groups({"rounds_get_collection", "games_get_collection", "games_get_post", "topten_get_post"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"leagues_get_collection","rounds_get_collection", "games_get_collection", "games_get_post"})
+     * @Groups({"leagues_get_collection","rounds_get_collection", "games_get_collection", "games_get_post", "topten_get_post"})
     */
     private $name;
 
@@ -54,6 +54,7 @@ class Round
     /**
      * @ORM\ManyToOne(targetEntity=League::class, inversedBy="rounds")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"games_get_post", "topten_get_post"})
      */
     private $league;
 
@@ -70,9 +71,16 @@ class Round
      */
     private $games;
 
+    /**
+     * @ORM\OneToMany(targetEntity=TopTen::class, mappedBy="round", orphanRemoval=true)
+     * @Groups({"rounds_get_collection"})
+     */
+    private $topTens;
+
     public function __construct()
     {
         $this->games = new ArrayCollection();
+        $this->topTens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -188,6 +196,36 @@ class Round
             // set the owning side to null (unless already changed)
             if ($game->getRound() === $this) {
                 $game->setRound(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TopTen>
+     */
+    public function getTopTens(): Collection
+    {
+        return $this->topTens;
+    }
+
+    public function addTopTen(TopTen $topTen): self
+    {
+        if (!$this->topTens->contains($topTen)) {
+            $this->topTens[] = $topTen;
+            $topTen->setRound($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTopTen(TopTen $topTen): self
+    {
+        if ($this->topTens->removeElement($topTen)) {
+            // set the owning side to null (unless already changed)
+            if ($topTen->getRound() === $this) {
+                $topTen->setRound(null);
             }
         }
 

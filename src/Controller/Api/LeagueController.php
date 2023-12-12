@@ -38,15 +38,16 @@ class LeagueController extends AbstractController
     public function getRoundsByLeagueId(LeagueRepository $leagueRepository, $id): JsonResponse
     {
         $league = $leagueRepository->find($id);
-
         if (!$league) {
             return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
         }
-
         $rounds = $league->getRounds(); 
-
-        
-        return $this->json($rounds, 200, [], ['groups' => 'rounds_get_collection']);
+        return $this->json(
+            $rounds,
+            200,
+            [],
+            ['groups' => 'rounds_get_collection']
+        );
     }
 
     /**
@@ -57,12 +58,15 @@ class LeagueController extends AbstractController
     public function getLeagueById(LeagueRepository $leagueRepository, $id): JsonResponse
     {
         $league = $leagueRepository->find($id);
-
         if (!$league) {
             return $this->json(['message' => "Cette ligue n'existe pas"], Response::HTTP_NOT_FOUND);
         }
-    
-        return $this->json($league, 200, [], ['groups' => 'leagues_get_collection']);
+        return $this->json(
+            $league,
+            200,
+            [],
+            ['groups' => 'leagues_get_collection']
+        );
     }
 
     /**
@@ -83,7 +87,7 @@ class LeagueController extends AbstractController
         if (empty($users)) {
             return $this->json(['message' => "Aucun utilisateur trouvé dans cette ligue"], Response::HTTP_OK);
         }
-        
+
         return $this->json(
             $users,
             Response::HTTP_OK,
@@ -135,11 +139,9 @@ class LeagueController extends AbstractController
 
         if (count($errors) > 0) {
             $errorMessages = [];
-
             foreach ($errors as $error) {
                 $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
             }
-            
             return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -149,9 +151,7 @@ class LeagueController extends AbstractController
         return $this->json(
             $league,
             Response::HTTP_CREATED,
-            [
-                'Location' => $this->generateUrl('app_api_league', ['id' => $league->getId()]),
-            ],
+            [],
             ['groups' => ['leagues_get_collection']]
         );
     }
@@ -186,13 +186,9 @@ class LeagueController extends AbstractController
     public function updateLeague(Request $request, League $league, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $jsonContent = $request->getContent();
-
         $updatedLeague = $serializer->deserialize($jsonContent, League::class, 'json');
-
         $errors = $validator->validate($updatedLeague);
-
         $league->setUpdatedAt(new \DateTime('now'));
-        
         if (count($errors) > 0) {
             $errorMessages = [];
 
@@ -242,7 +238,6 @@ class LeagueController extends AbstractController
         if (empty($users)) {
             return $this->json(['message' => "Aucun utilisateur trouvé dans cette ligue"], Response::HTTP_OK);
         }
-        
         return $this->json(
             $users,
             Response::HTTP_OK,

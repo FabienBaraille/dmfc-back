@@ -41,7 +41,6 @@ class Leaderboard
      */
     private $updatedAt;
 
-    
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="leaderboards")
      * @ORM\JoinColumn(nullable=false)
@@ -54,6 +53,18 @@ class Leaderboard
      * @Groups({"leaderbord"})
      */
     private $Season;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_users", "leaderbord"})
+     */
+    private $FinalscoreTOP;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_users", "leaderbord"})
+     */
+    private $FinalscorePO;
 
 
     public function getId(): ?int
@@ -129,6 +140,30 @@ class Leaderboard
     public function setSeason(?Season $Season): self
     {
         $this->Season = $Season;
+
+        return $this;
+    }
+
+    public function getFinalscoreTOP(): ?int
+    {
+        return $this->FinalscoreTOP;
+    }
+
+    public function setFinalscoreTOP(?int $FinalscoreTOP): self
+    {
+        $this->FinalScoreTOP = $FinalscoreTOP;
+
+        return $this;
+    }
+
+    public function getFinalscorePO(): ?int
+    {
+        return $this->FinalscorePO;
+    }
+
+    public function setFinalscorePO(?int $FinalscorePO): self
+    {
+        $this->FinalscorePO = $FinalscorePO;
 
         return $this;
     }

@@ -24,13 +24,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection","rounds_get_collection","leaderbord","prediction"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "rounds_get_collection", "leaderbord", "prediction", "betTop_get_collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users","leaderbord","prediction"})
+     * @Groups({"user_get_collection", "user_get_item", "leagues_get_collection", "leagues_get_users", "leaderbord", "prediction"})
      * @Assert\NotBlank
      */
     private $username;
@@ -123,11 +123,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $rounds;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BetTop::class, mappedBy="User", orphanRemoval=true)
+     */
+    private $betTops;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
+     */
+    private $scoreTOP;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Groups({"leagues_get_collection","user_get_item","user_get_collection"})
+     */
+    private $scorePO;
+
     public function __construct()
     {
         $this->leaderboards = new ArrayCollection();
         $this->srpredictions = new ArrayCollection();
         $this->rounds = new ArrayCollection();
+        $this->betTops = new ArrayCollection();
     }
 
 
@@ -407,5 +425,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
+
+    /**
+     * @return Collection<int, BetTop>
+     */
+    public function getBetTops(): Collection
+    {
+        return $this->betTops;
+    }
+
+    public function addBetTop(BetTop $betTop): self
+    {
+        if (!$this->betTops->contains($betTop)) {
+            $this->betTops[] = $betTop;
+            $betTop->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBetTop(BetTop $betTop): self
+    {
+        if ($this->betTops->removeElement($betTop)) {
+            // set the owning side to null (unless already changed)
+            if ($betTop->getUser() === $this) {
+                $betTop->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    
+    public function getScoreTOP(): ?int
+    {
+        return $this->scoreTOP;
+    }
+
+    public function setScoreTOP(?int $scoreTOP): self
+    {
+        $this->scoreTOP = $scoreTOP;
+
+        return $this;
+    }
+
+    public function getScorePO(): ?int
+    {
+        return $this->scorePO;
+    }
+
+    public function setScorePO(?int $scorePO): self
+    {
+        $this->scorePO = $scorePO;
+
+        return $this;
+    }
+
     
 }

@@ -80,6 +80,10 @@ security:
          - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
          - { path: ^/api/seasons, roles: ROLE_JOUEUR }
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+         - { path: ^/api/topten, roles: ROLE_JOUEUR }
+         - { path: ^/api/topten, roles: ROLE_DMFC, methods: UPDATE }
+         - { path: ^/api/topten, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/bettop, roles: ROLE_JOUEUR }
 
          # Back
          - { path: ^/back/logout, roles: PUBLIC_ACCESS }

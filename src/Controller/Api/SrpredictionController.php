@@ -171,7 +171,7 @@ class SrpredictionController extends AbstractController
         if (isset($data['bonusBookie'])) {
             $srprediction->setBonusBookie($data['bonusBookie']);
         }
-        
+
         // Validez les données mises à jour avec le groupe de validation
         $violations = $validator->validate($srprediction, null, ['update_dmfc']);
 
