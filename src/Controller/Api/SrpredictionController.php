@@ -7,9 +7,11 @@ use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\Srprediction;
 use App\Repository\UserRepository;
+
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SrpredictionRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,6 +48,30 @@ class SrpredictionController extends AbstractController
         // Vous pouvez renvoyer les prédictions sous forme de réponse JSON
         return $this->json(
             $predictions,
+            200,
+            [],
+            ['groups' => 'prediction']
+        );
+    }
+    /**
+     * Get all predictions by ids list of users
+     * 
+     * @Route("/api/srpreditions/users/{ids}", name="app_api_srpredictions_by_users_list", methods={"GET"})
+     */
+    public function srPredictionsByUsersList(UserRepository $userRepository, SrpredictionRepository $predictionRepository, $ids): JsonResponse
+    {
+        $allPredictions = [];
+        $idsList = json_decode($ids, true);
+        foreach ($idsList as $key => $id) {
+            $user = $userRepository->find($id);
+            if (!$user) {
+                return $this->json(['error' => 'User not found'], 404);
+            }
+            $predictions = $predictionRepository->findBy(['User' => $user]);
+            $allPredictions[$key] = ($predictions);
+        }
+        return $this->json(
+            $allPredictions,
             200,
             [],
             ['groups' => 'prediction']
@@ -196,6 +222,49 @@ class SrpredictionController extends AbstractController
         ];
 
         return new JsonResponse($response);
+    }
+    /**
+     * Update bet points for all bets from an array of ids
+     * 
+     * @Route("/api/prediction/update/", name="app_api_srpreditcion_multiple_update_points", methods={"PUT"})
+     */
+    public function multiplePredictionsScoreUpdate(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['idsList'])) {
+            foreach ($data['idsList'] as $key => $id) {
+                $srprediction = $entityManager->getRepository(SRPrediction::class)->find($id);
+                if (!$srprediction) {
+                    return $this->json(['message' => "Ce pronostic n'existe pas."], Response::HTTP_NOT_FOUND);
+                }
+                if (isset($data['pointScored'])) {
+                    $srprediction->setPointScored($data['pointScored'][$key]);
+                }
+                if (isset($data['bonusPointsErned'])) {
+                    $srprediction->setBonusPointsErned($data['bonusPointsErned'][$key]);
+                }
+                if (isset($data['bonusBookie'])) {
+                    $srprediction->setBonusBookie($data['bonusBookie'][$key]);
+                }
+                $violations = $validator->validate($srprediction, null, ['update_dmfc']);
+
+                if (count($violations) > 0) {
+                    $errors = [];
+                    foreach ($violations as $violation) {
+                        $errors[$violation->getPropertyPath()] = $violation->getMessage();
+                    }
+                    return new JsonResponse(['errors' => $errors], 400);
+                }
+                $entityManager->persist($srprediction);
+                $entityManager->flush();
+            }
+            return $this->json(
+                ['message' => 'Mises à jour réalisées avec succès.'],
+                Response::HTTP_OK,
+                [],
+                ['groups' => 'user_get_item']
+            );
+        }
     }
 }
 
