@@ -54,7 +54,7 @@ class SrpredictionController extends AbstractController
         );
     }
     /**
-     * Get all predictions by ids list of users
+     * Get all predictions of each player by ids list of player
      * 
      * @Route("/api/srpreditions/users/{ids}", name="app_api_srpredictions_by_users_list", methods={"GET"})
      */
@@ -226,7 +226,7 @@ class SrpredictionController extends AbstractController
     /**
      * Update bet points for all bets from an array of ids
      * 
-     * @Route("/api/prediction/update/", name="app_api_srpreditcion_multiple_update_points", methods={"PUT"})
+     * @Route("/api/prediction/update/", name="app_api_srpreditcion_multiple_update_points", methods={"PATCH"})
      */
     public function multiplePredictionsScoreUpdate(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
@@ -237,13 +237,13 @@ class SrpredictionController extends AbstractController
                 if (!$srprediction) {
                     return $this->json(['message' => "Ce pronostic n'existe pas."], Response::HTTP_NOT_FOUND);
                 }
-                if (isset($data['pointScored'])) {
+                if (isset($data['pointScored'][$key])) {
                     $srprediction->setPointScored($data['pointScored'][$key]);
                 }
-                if (isset($data['bonusPointsErned'])) {
+                if (isset($data['bonusPointsErned'][$key])) {
                     $srprediction->setBonusPointsErned($data['bonusPointsErned'][$key]);
                 }
-                if (isset($data['bonusBookie'])) {
+                if (isset($data['bonusBookie'][$key])) {
                     $srprediction->setBonusBookie($data['bonusBookie'][$key]);
                 }
                 $violations = $validator->validate($srprediction, null, ['update_dmfc']);
@@ -262,7 +262,7 @@ class SrpredictionController extends AbstractController
                 ['message' => 'Mises à jour réalisées avec succès.'],
                 Response::HTTP_OK,
                 [],
-                ['groups' => 'user_get_item']
+                ['groups' => 'prediction']
             );
         }
     }
