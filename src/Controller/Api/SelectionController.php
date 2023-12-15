@@ -18,6 +18,7 @@ class SelectionController extends AbstractController
 {
   /**
    * GET selections by league Id
+   * 
    * @Route("/api/selections/{id}", name="app_api_selections", methods={"GET"})
    */
   public function getSelections(LeagueRepository $leagueRepository, SelectionRepository $selectionRepository, $id): JsonResponse

@@ -176,6 +176,45 @@ class TopTenController extends AbstractController
         );
     }
     /**
+     * Update all Top Tens results
+     * 
+     * @Route("/api/topten/results/", name="app_api_toptens_results", methods={"PUT"})
+     */
+    public function updateAllToptensResults(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $toptensList = [];
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['idsList'])) {
+            foreach ($data['idsList'] as $key => $id) {
+                $topten = $entityManager->getRepository(TopTen::class)->find($id);
+                if (!$topten) {
+                    return $this->json(['message' => "Ce Top 10 n'existe pas."], Response::HTTP_NOT_FOUND);
+                }
+                if (isset($data['results'])) {
+                    $topten->setResults($data['results']);
+                }
+                $errors = $validator->validate($topten);
+                if (count($errors) > 0) {
+                    $errorMessages = [];
+
+                    foreach ($errors as $error) {
+                        $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
+                    }
+                    return $this->json(['errors' => $errorMessages, Response::HTTP_UNPROCESSABLE_ENTITY]);
+                }
+                $entityManager->persist($topten);
+                $entityManager->flush();
+                $toptensList[$key] = $topten;
+            }
+            return $this->json(
+                $toptensList,
+                Response::HTTP_OK,
+                [],
+                ['groups' => 'topten_get_post']
+            );
+        }
+    }
+    /**
      * Delete Top ten
      * 
      * @Route("/api/topten/{id}", name="app_api_topten_delete", methods={"DELETE"})

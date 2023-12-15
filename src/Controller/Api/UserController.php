@@ -331,9 +331,6 @@ class UserController extends AbstractController
             // Associez l'utilisateur à la nouvelle équipe
             $user->setTeam($newTeam);
         }
-
-    
-
         // Validez les modifications apportées à l'utilisateur
         $errors = $validator->validate($user);
 
@@ -403,7 +400,7 @@ class UserController extends AbstractController
         if (isset($data['scorePO'])) {
             $user->setScorePO($data['scorePO']);
         }
-        
+
         if (isset($data['oldPosition'])) {
             $user->setOldPosition($data['oldPosition']);
         }
@@ -450,4 +447,52 @@ class UserController extends AbstractController
             ['groups' => ['user_get_item']]
         );
     }
+    /**
+     * Score update by DMFC
+     * 
+     * @Route ("/api/user/updateScore/", name="app_api_update_score_player", methods={"PUT"})
+     */
+    public function multipleUpdateScore(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator):JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['idsList'])) {
+            foreach ($data['idsList'] as $key => $id) {
+                $user = $entityManager->getRepository(User::class)->find($id);
+                if (!$user) {
+                    return $this->json(['message' => "Cet utilisateur n'existe pas."], Response::HTTP_NOT_FOUND);
+                }
+                if (isset($data['scores'])) {
+                    $user->setScore($data['scores'][$key]);
+                }
+                if (isset($data['scoresTOP'])) {
+                    $user->setScoreTOP($data['scoresTOP'][$key]);
+                }
+                if (isset($data['scoresPO'])) {
+                    $user->setScorePO($data['scoresPO'][$key]);
+                }
+                if (isset($data['oldPositions'])) {
+                    $user->setOldPosition($data['oldPositions'][$key]);
+                }
+
+                $violations = $validator->validate($user, null, null);
+                if (count($violations) > 0) {
+                    // Gérez les erreurs de validation, par exemple, renvoyez une réponse JSON d'erreur
+                    $errors = [];
+                    foreach ($violations as $violation) {
+                        $errors[$violation->getPropertyPath()] = $violation->getMessage();
+                    }
+                    return new JsonResponse(['errors' => $errors], 400);
+                }
+
+                $entityManager->persist($user);
+                $entityManager->flush();
+            }
+            return $this->json(
+                ['message' => 'Mises à jour réalisées avec succès.'],
+                Response::HTTP_OK,
+                [],
+                ['groups' => 'user_get_item']
+            );
+        }
+        }
 }

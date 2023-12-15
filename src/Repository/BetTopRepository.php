@@ -72,6 +72,21 @@ class BetTopRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findByConference($conf): array
+    {
+        $qb = $this->createQueryBuilder('b');
+
+        $qb->select('b')
+            // Equal to INNER JOIN `top_ten` as t ON b.topten_id = t.id
+            ->join('b.topten', 't')
+            ->where('t.conference = :conference')
+            ->setParameter('conference', $conf);
+
+        $query = $qb->getQuery();
+
+        return $query->getResult();
+    }
+
 //    /**
 //     * @return BetTop[] Returns an array of BetTop objects
 //     */
