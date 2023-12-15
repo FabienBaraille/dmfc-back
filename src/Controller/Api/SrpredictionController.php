@@ -149,7 +149,7 @@ class SrpredictionController extends AbstractController
     /**
     * POST prediction by user update
     * 
-    * @Route("/api/prediction/update/{id}", name="update_prediction", methods={"PUT"})
+    * @Route("/api/srprediction/update/{id}", name="update_prediction", methods={"PUT"})
     */
     public function updateSrPrediction(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, Srprediction $srprediction): JsonResponse
     {
@@ -180,7 +180,7 @@ class SrpredictionController extends AbstractController
         return new JsonResponse(['message' => 'Votre pronostic a été mis à jour avec succès', 'prediction' => json_decode($jsonData)]);
     }
     /**
-     * @Route("/api/prediction/{id}/dmfc", name="app_api_update_prediction_by_dmfc", methods={"PUT"})
+     * @Route("/api/srprediction/{id}/dmfc", name="app_api_update_prediction_by_dmfc", methods={"PUT"})
      */
     public function updatePredictionByDmfc(Request $request, Srprediction $srprediction, ValidatorInterface $validator)
     {
@@ -226,7 +226,7 @@ class SrpredictionController extends AbstractController
     /**
      * Update bet points for all bets from an array of ids
      * 
-     * @Route("/api/prediction/update/", name="app_api_srpreditcion_multiple_update_points", methods={"PATCH"})
+     * @Route("/api/srprediction/update/", name="app_api_srpreditcion_multiple_update_points", methods={"PATCH"})
      */
     public function multiplePredictionsScoreUpdate(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {

@@ -57,33 +57,53 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-         # API
-         - { path: ^/api/user/id/dmfc, roles: ROLE_DMFC, methods: UPDATE }
-         - { path: ^/api/users, roles: ROLE_ADMIN }
+         #  Public access
          - { path: ^/api/user/new, roles: PUBLIC_ACCESS }
-         - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
-         - { path: ^/api/user/id, roles: ROLE_JOUEUR, methods: UPDATE }
          - { path: ^/api/league/new, roles: PUBLIC_ACCESS }
          - { path: ^/api/leagues, roles: PUBLIC_ACCESS }
-         - { path: ^/api/league, roles: ROLE_JOUEUR }
-         - { path: ^/api/leagues/id, roles: ROLE_ADMIN, methods: DELETE}
-         - { path: ^/api/leagues/id, roles: ROLE_DMFC, methods: UPDATE}
-         - { path: ^/api/league/id/users/leaderbord, roles: ROLE_JOUEUR }
-         - { path: ^/api/news/new, roles: ROLE_DMFC }
-         - { path: ^/api/news, roles: PUBLIC_ACCESS }
-         - { path: ^/api/news, roles: ROLE_JOUEUR }
-         - { path: ^/api/prediction/new, roles: ROLE_JOUEUR }
-         - { path: ^/api/prediction, roles: ROLE_JOUEUR, methods: UPDATE }
-         - { path: ^/api/prediction, roles: ROLE_ADMIN, methods: DELETE }
-         - { path: ^/api/round/new, roles: ROLE_DMFC }
-         - { path: ^/api/round, roles: ROLE_DMFC, methods: UPDATE }
-         - { path: ^/api/round, roles: ROLE_DMFC, methods: DELETE }
-         - { path: ^/api/seasons, roles: ROLE_JOUEUR }
+         # API
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+         # Users Endpoints
+         - { path: ^/api/user/id/dmfc, roles: ROLE_DMFC, methods: [PUT, PATCH] }
+         - { path: ^/api/users, roles: ROLE_ADMIN }
+         - { path: ^/api/user, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/user/id, roles: ROLE_JOUEUR, methods: [PUT, PATCH] }
+         # Season Endpoints
+         - { path: ^/api/seasons, roles: ROLE_JOUEUR, methods: GET }
+         - { path: ^/api/seasons, roles: ROLE_ADMIN, methods: [POST, PUT, PATCH, DELETE] }
+         # Team Endpoints
+         - { path: ^/api/teams, roles: ROLE_JOUEUR, methods: GET }
+         - { path: ^/api/team, roles: ROLE_ADMIN, methods: [POST, PUT, PATCH, DELETE] }
+         # League Endpoints
+         - { path: ^/api/league, roles: ROLE_JOUEUR }
+         - { path: ^/api/leagues/id, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/leagues/id, roles: ROLE_DMFC, methods: [PUT, PATCH] }
+         - { path: ^/api/league/id/users/leaderbord, roles: ROLE_JOUEUR }
+         # News Endpoints
+         - { path: ^/api/news, roles: ROLE_DMFC, methods: [POST, PUT, PATCH] }
+         - { path: ^/api/news, roles: ROLE_JOUEUR, methods: GET }
+         # Round Endpoints
+         - { path: ^/api/round, roles: ROLE_DMFC, methods: [POST, PUT, PATCH] }
+         - { path: ^/api/round, roles: ROLE_JOUEUR, methods: GET }
+         # Selection Endpoints
+         - { path: ^/api/selections, roles: ROLE_JOUEUR, methods: GET }
+         # Games Endpoints
+         - { path: ^/api/game, roles: ROLE_JOUEUR, methods: GET }
+         - { path: ^/api/prediction/new, roles: ROLE_DMFC, methods: [POST, PUT, PATCH, DELETE] }
+         # predictions Endpoints
+         - { path: ^/api/srprediction, roles: ROLE_JOUEUR }
+         - { path: ^/api/srprediction/update/, roles: ROLE_DMFC }
+         - { path: ^/api/srprediction/id/dmfc, roles: ROLE_DMFC }
+         - { path: ^/api/srprediction, roles: ROLE_ADMIN, methods: DELETE }
+         # Toptens Endpoints
          - { path: ^/api/topten, roles: ROLE_JOUEUR }
-         - { path: ^/api/topten, roles: ROLE_DMFC, methods: UPDATE }
+         - { path: ^/api/topten, roles: ROLE_DMFC, methods: [POST, PUT, PATCH] }
          - { path: ^/api/topten, roles: ROLE_ADMIN, methods: DELETE }
+         # Bet Top Tens Endpoints
          - { path: ^/api/bettop, roles: ROLE_JOUEUR }
+         - { path: ^/api/bettop, roles: ROLE_ADMIN, methods: DELETE }
+         - { path: ^/api/bettop/id/DMFC, roles: ROLE_DMFC }
+         - { path: ^/api/bettop/update/score/, roles: ROLE_DMFC }
 
          # Back
          - { path: ^/back/logout, roles: PUBLIC_ACCESS }
